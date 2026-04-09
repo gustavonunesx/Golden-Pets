@@ -40,7 +40,7 @@ export function Hero() {
               className="inline-flex items-center gap-2 bg-orange-100 text-orange-600 px-4 py-2 rounded-full text-sm font-bold mb-6"
             >
               <Star className="w-4 h-4 fill-current" />
-              +500 tutores satisfeitos este mes
+              +500 tutores satisfeitos este mês
             </motion.div>
 
             {/* Main Title - Word by Word Animation */}
@@ -63,8 +63,8 @@ export function Hero() {
               variants={fadeUp}
               className="text-lg md:text-xl text-gray-500 max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed"
             >
-              Produtos premium para cachorros e gatos com entrega rapida para todo o Brasil. 
-              Qualidade garantida e precos que cabem no seu bolso.
+              Produtos premium para cachorros e gatos com entrega rápida para todo o Brasil. 
+              Qualidade garantida e preços que cabem no seu bolso.
             </motion.p>
 
             {/* CTA Buttons */}
@@ -86,7 +86,7 @@ export function Hero() {
             >
               <div className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-primary" />
-                <span>Entrega rapida</span>
+                <span>Entrega rápida</span>
               </div>
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-primary" />

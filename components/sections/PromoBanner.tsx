@@ -52,7 +52,7 @@ export function PromoBanner() {
               <div className="flex flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
                   <Truck className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="text-xs sm:text-sm font-medium">Frete Gratis</span>
+                  <span className="text-xs sm:text-sm font-medium">Frete Grátis</span>
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
                   <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

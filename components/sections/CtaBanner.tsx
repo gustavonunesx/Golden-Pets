@@ -55,7 +55,7 @@ export function CtaBanner() {
             variants={fadeUp}
             className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10"
           >
-            Aproveite nossas ofertas exclusivas e de o melhor para quem faz parte da sua familia. Frete gratis acima de R$ 199.
+            Aproveite nossas ofertas exclusivas e de o melhor para quem faz parte da sua familia. Frete grátis acima de R$ 199.
           </motion.p>
           <motion.div variants={fadeUp}>
             <Link href="/produtos">

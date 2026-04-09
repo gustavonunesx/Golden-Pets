@@ -7,7 +7,7 @@ import { fadeUp, staggerContainer } from '@/lib/animations'
 const trustItems = [
   {
     icon: Truck,
-    title: 'Entrega Rapida',
+    title: 'Entrega Rápida',
     description: 'Para todo o Brasil'
   },
   {
@@ -18,12 +18,12 @@ const trustItems = [
   {
     icon: CreditCard,
     title: 'Pague como quiser',
-    description: 'Pix, cartao ou boleto'
+    description: 'Pix, cartão ou boleto'
   },
   {
     icon: Headphones,
     title: 'Suporte 24h',
-    description: 'Sempre disponivel'
+    description: 'Sempre disponível'
   }
 ]
 

@@ -13,17 +13,17 @@ const features = [
   {
     icon: Award,
     title: 'Marcas Premium',
-    description: 'Trabalhamos apenas com marcas reconhecidas e confiadas por veterinarios.'
+    description: 'Trabalhamos apenas com marcas reconhecidas e confiadas por veterinários.'
   },
   {
     icon: Truck,
     title: 'Entrega Express',
-    description: 'Receba seus produtos em casa com rapidez e seguranca. Rastreamento em tempo real.'
+    description: 'Receba seus produtos em casa com rapidez e segurança. Rastreamento em tempo real.'
   },
   {
     icon: Clock,
     title: 'Atendimento Dedicado',
-    description: 'Time de especialistas prontos para ajudar voce e seu pet 24 horas por dia.'
+    description: 'Time de especialistas prontos para ajudar você e seu pet 24 horas por dia.'
   }
 ]
 

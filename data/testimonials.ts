@@ -7,7 +7,7 @@ export const testimonials: Testimonial[] = [
     petName: 'Thor',
     petType: 'Golden Retriever',
     text: 'A coleira anti-pulgas é incrível! Meu Thor estava sofrendo muito com pulgas e em poucos dias já estava livre. Recomendo demais!',
-    rating: 5,
+    rating: 4.5,
     avatarColor: '#f97316'
   },
   {

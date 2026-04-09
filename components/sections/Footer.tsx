@@ -120,10 +120,10 @@ export function Footer() {
         <div className="border-t border-gray-800 mt-12 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm text-center md:text-left">
-              2024 Golden Pets. Todos os direitos reservados.
+              2026 Golden Pets. Todos os direitos reservados.
             </p>
             <p className="text-gray-500 text-sm">
-              CNPJ: 12.345.678/0001-90 (Empresa Ficticia)
+              {/* CNPJ: 12.345.678/0001-90 (Empresa Ficticia) */}
             </p>
           </div>
         </div>

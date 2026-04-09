@@ -86,7 +86,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div className="mt-auto pt-2.5 sm:pt-4">
             <div className="py-1.5 sm:py-2 text-center bg-gray-50 -mx-2.5 sm:-mx-4 -mb-2.5 sm:-mb-4 group-hover:bg-primary group-hover:text-white transition-colors font-bold text-xs sm:text-base">
-              Ver produto - lembrar de remover
+              
             </div>
           </div>
         </div>

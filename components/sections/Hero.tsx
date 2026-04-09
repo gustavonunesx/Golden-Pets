@@ -64,7 +64,7 @@ export function Hero() {
               className="text-lg md:text-xl text-gray-500 max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed"
             >
               Produtos premium para cachorros e gatos com entrega rápida para todo o Brasil. 
-              Qualidade garantida e preços que cabem no seu bolso.
+              Qualidade garantida e preços que cabem no seu bolso!
             </motion.p>
 
             {/* CTA Buttons */}
@@ -74,9 +74,9 @@ export function Hero() {
                   Ver produtos
                 </CustomButton>
               </Link>
-              <CustomButton variant="ghost" size="lg">
+              {/* <CustomButton variant="ghost" size="lg">
                 Como funciona
-              </CustomButton>
+              </CustomButton> */}
             </motion.div>
 
             {/* Trust Indicators */}
@@ -144,7 +144,7 @@ export function Hero() {
                   transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
                   className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 bg-primary text-white rounded-full px-3 py-1.5 sm:px-4 sm:py-2 shadow-lg"
                 >
-                  <p className="text-xs sm:text-sm font-bold">Frete Gratis</p>
+                  <p className="text-xs sm:text-sm font-bold">Frete Grátis</p>
                 </motion.div>
               </div>
             </motion.div>

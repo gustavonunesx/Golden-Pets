@@ -207,7 +207,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     : 'border-transparent text-gray-500 hover:text-gray-800'
                 }`}
               >
-                {tab === 'descricao' ? 'Descricao' : tab === 'especificacoes' ? 'Especificacoes' : 'Avaliacoes'}
+                {tab === 'descricao' ? 'Descrição' : tab === 'especificacoes' ? 'Especificações' : 'Avaliações'}
               </button>
             ))}
           </div>

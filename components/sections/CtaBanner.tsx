@@ -49,7 +49,7 @@ export function CtaBanner() {
             variants={fadeUp}
             className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-6"
           >
-            Seu pet nao pode esperar.
+            Seu pet não pode esperar!
           </motion.h2>
           <motion.p
             variants={fadeUp}

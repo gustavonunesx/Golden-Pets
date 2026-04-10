@@ -12,6 +12,7 @@ next.user-config.*
 .env
 .env.*
 out/
+.*sql
 
 # Common ignores
 node_modules

@@ -263,6 +263,10 @@ body {
 .summary-box-title { font-size: 16px; font-weight: 700; color: var(--blue-text); margin-bottom: 8px; }
 .summary-box-text { font-size: 14px; color: var(--blue-text); line-height: 1.6; }
 
+.future-box { background: var(--orange-bg); border-radius: 12px; padding: 20px; margin-top: 16px; border: 1px solid rgba(249, 115, 22, 0.1); transition: background-color 0.3s ease;}
+.future-box-title { font-size: 15px; font-weight: 700; color: var(--orange-text); margin-bottom: 8px; }
+.future-box-text { font-size: 13px; color: var(--orange-text); line-height: 1.7; }
+
 .arrow { font-size: 12px; color: var(--text-tertiary); transition: transform 0.3s ease; margin-left: auto; }
 .step-head.opened .arrow { transform: rotate(180deg); color: var(--blue-main); }
 </style>
@@ -273,8 +277,8 @@ body {
   <button class="theme-toggle" id="themeToggle" title="Alternar Tema">☀️</button>
   
   <div class="header-container">
-    <h2 style="font-size: 24px; color: var(--text-primary); margin-bottom: 8px;">Roadmap de Lançamento</h2>
-    <p style="font-size: 14px; color: var(--text-secondary);">Guia prático para colocar a Golden Pets no ar.</p>
+    <h2 style="font-size: 24px; color: var(--text-primary); margin-bottom: 8px;">Roadmap Golden Pets</h2>
+    <p style="font-size: 14px; color: var(--text-secondary);">Roadmap completo para colocar a Golden Pets no ar com pagamentos e dashboard.</p>
   </div>
 
   <div class="progress-container">
@@ -319,7 +323,7 @@ body {
           <div class="detail-row">Anote as credenciais: <strong>Project URL</strong> e <strong>anon public key</strong> — você vai precisar no .env</div>
           <div class="cmd"><span class="cm"># instalar no seu projeto Next.js</span><br><span class="kw">npm install</span> <span class="str">@supabase/supabase-js @supabase/ssr</span></div>
           <div class="detail-row">Crie o arquivo <strong>.env.local</strong> na raiz do projeto com as variáveis do Supabase</div>
-          <div class="tip">O plano gratuito inclui 500MB de banco, 5GB de storage e 50.000 usuários autenticados.</div>
+          <div class="tip">O plano gratuito inclui 500MB de banco, 5GB de storage e 50.000 usuários autenticados — mais que suficiente para validar a loja.</div>
         </div>
       </div>
 
@@ -332,7 +336,35 @@ body {
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">No painel do Supabase vá em <strong>SQL Editor</strong> e execute as queries para criar as tabelas.</div>
+          <div class="detail-row">No painel do Supabase vá em <strong>SQL Editor</strong> e execute as queries abaixo para criar as tabelas:</div>
+          <div class="cmd"><span class="cm">-- Tabela de produtos</span><br>
+<span class="kw">CREATE TABLE</span> products (<br>
+&nbsp;&nbsp;id <span class="str">uuid</span> DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+&nbsp;&nbsp;name <span class="str">text</span> NOT NULL,<br>
+&nbsp;&nbsp;slug <span class="str">text</span> UNIQUE NOT NULL,<br>
+&nbsp;&nbsp;description <span class="str">text</span>,<br>
+&nbsp;&nbsp;price <span class="str">numeric(10,2)</span> NOT NULL,<br>
+&nbsp;&nbsp;original_price <span class="str">numeric(10,2)</span>,<br>
+&nbsp;&nbsp;stock <span class="str">integer</span> DEFAULT 0,<br>
+&nbsp;&nbsp;category <span class="str">text</span>,<br>
+&nbsp;&nbsp;images <span class="str">text[]</span>,<br>
+&nbsp;&nbsp;active <span class="str">boolean</span> DEFAULT true,<br>
+&nbsp;&nbsp;created_at <span class="str">timestamptz</span> DEFAULT now()<br>
+);<br><br>
+<span class="cm">-- Tabela de pedidos</span><br>
+<span class="kw">CREATE TABLE</span> orders (<br>
+&nbsp;&nbsp;id <span class="str">uuid</span> DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+&nbsp;&nbsp;customer_email <span class="str">text</span> NOT NULL,<br>
+&nbsp;&nbsp;customer_name <span class="str">text</span>,<br>
+&nbsp;&nbsp;items <span class="str">jsonb</span> NOT NULL,<br>
+&nbsp;&nbsp;total <span class="str">numeric(10,2)</span> NOT NULL,<br>
+&nbsp;&nbsp;status <span class="str">text</span> DEFAULT <span class="str">'pending'</span>,<br>
+&nbsp;&nbsp;payment_method <span class="str">text</span>,<br>
+&nbsp;&nbsp;payment_id <span class="str">text</span>,<br>
+&nbsp;&nbsp;address <span class="str">jsonb</span>,<br>
+&nbsp;&nbsp;created_at <span class="str">timestamptz</span> DEFAULT now()<br>
+);</div>
+          <div class="tip">Crie também tabelas: <strong>customers</strong> (dados do cliente), <strong>categories</strong> (categorias de produtos) e <strong>admin_users</strong> (apenas você terá acesso).</div>
         </div>
       </div>
 
@@ -340,13 +372,20 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p1-3" title="Marcar como concluído">
           <div class="step-idx">3</div>
-          <div class="step-info"><div class="step-name">Configurar autenticação de admin</div><div class="step-desc">Só você acessa o dashboard</div></div>
+          <div class="step-info"><div class="step-name">Configurar autenticação de admin</div><div class="step-desc">Só você acessa o dashboard — nenhum cliente entra</div></div>
           <span class="step-badge tag-blue">Rápido</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">No Supabase vá em <strong>Authentication → Users</strong> e crie seu usuário admin.</div>
-          <div class="detail-row">Crie um <strong>middleware.ts</strong> na raiz para proteger as rotas <strong>/admin/*</strong>.</div>
+          <div class="detail-row">No Supabase vá em <strong>Authentication → Users → Add user</strong> e crie seu usuário admin com email e senha forte</div>
+          <div class="detail-row">Crie o arquivo <strong>/app/admin/login/page.tsx</strong> com formulário de login usando <strong>supabase.auth.signInWithPassword()</strong></div>
+          <div class="detail-row">Crie um <strong>middleware.ts</strong> na raiz do projeto para proteger todas as rotas <strong>/admin/*</strong> — redireciona para login se não autenticado</div>
+          <div class="cmd"><span class="cm">// middleware.ts — protege rotas admin</span><br>
+<span class="kw">import</span> { createMiddlewareClient } from <span class="str">'@supabase/ssr'</span><br>
+<span class="kw">export const</span> config = {<br>
+&nbsp;&nbsp;matcher: [<span class="str">'/admin/:path*'</span>]<br>
+}</div>
+          <div class="tip">Isso garante que nenhum cliente acidentalmente acesse seu painel de gestão.</div>
         </div>
       </div>
 
@@ -354,12 +393,20 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p1-4" title="Marcar como concluído">
           <div class="step-idx">4</div>
-          <div class="step-info"><div class="step-name">Conectar front-end ao banco</div><div class="step-desc">Substituir mocks pelo banco real</div></div>
+          <div class="step-info"><div class="step-name">Conectar front-end ao banco</div><div class="step-desc">Substituir /data/products.ts pelo banco real</div></div>
           <span class="step-badge tag-orange">Crítico</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Crie <strong>/lib/supabase.ts</strong> com o client configurado. Substitua consultas estáticas por queries Server Components.</div>
+          <div class="detail-row">Crie <strong>/lib/supabase.ts</strong> com o client configurado</div>
+          <div class="detail-row">Nas suas páginas de produto, substitua o import estático por uma query real:</div>
+          <div class="cmd"><span class="cm">// Em /app/produtos/page.tsx</span><br>
+<span class="kw">const</span> { data: products } = <span class="kw">await</span> supabase<br>
+&nbsp;&nbsp;.from(<span class="str">'products'</span>)<br>
+&nbsp;&nbsp;.select(<span class="str">'*'</span>)<br>
+&nbsp;&nbsp;.eq(<span class="str">'active'</span>, true)<br>
+&nbsp;&nbsp;.order(<span class="str">'created_at'</span>, { ascending: false })</div>
+          <div class="tip">Como é Next.js com Server Components, essa query roda no servidor — o banco nunca fica exposto ao cliente.</div>
         </div>
       </div>
 
@@ -382,11 +429,15 @@ body {
           <input type="checkbox" class="step-check" id="chk-p2-1" title="Marcar como concluído">
           <div class="step-idx">1</div>
           <div class="step-info"><div class="step-name">Por que MercadoPago para começar</div><div class="step-desc">Comparativo dos gateways para o mercado brasileiro</div></div>
-          <span class="step-badge tag-blue">Info</span>
+          <span class="step-badge tag-blue">Leia primeiro</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Taxa ~4,49% (cartão 14 dias). API fácil, amplamente conhecido pelo consumidor BR.</div>
+          <div class="detail-row"><strong>MercadoPago</strong> — Taxa ~4,49% (cartão 14 dias). Pix + boleto + cartão. API fácil, amplamente conhecido pelo consumidor BR. Ideal para começar.</div>
+          <div class="detail-row"><strong>Pagar.me</strong> — Taxa 3,99% + R$0,99. Checkout mais bonito, API mais técnica. Melhor para volume médio (acima de 50 pedidos/mês).</div>
+          <div class="detail-row"><strong>Stripe</strong> — Taxa 3,99% + R$0,39. Excelente documentação, suporta Pix. Indicado se você quiser vender para fora do Brasil também.</div>
+          <div class="detail-row"><strong>PagBank</strong> — Similar ao MercadoPago, popular no Brasil, checkout reconhecido.</div>
+          <div class="tip"><strong>Recomendação:</strong> comece com MercadoPago por ser o mais fácil de integrar, mais reconhecido pelo consumidor brasileiro e sem mensalidade. Quando tiver volume, migre para Pagar.me para pagar menos taxa.</div>
         </div>
       </div>
 
@@ -395,11 +446,15 @@ body {
           <input type="checkbox" class="step-check" id="chk-p2-2" title="Marcar como concluído">
           <div class="step-idx">2</div>
           <div class="step-info"><div class="step-name">Criar conta e obter credenciais</div><div class="step-desc">MercadoPago Developer — acesso à API</div></div>
-          <span class="step-badge tag-blue">Grátis</span>
+          <span class="step-badge tag-blue">Sem mensalidade</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Vá em <strong>Seu negócio → Credenciais</strong>. Use as de teste primeiro.</div>
+          <div class="detail-row">Acesse <strong>mercadopago.com.br</strong> e crie conta como pessoa física ou jurídica (PJ é obrigatório para sacar acima de R$20k/mês)</div>
+          <div class="detail-row">Vá em <strong>Seu negócio → Configurações → Credenciais</strong> para pegar o <strong>Access Token</strong> e <strong>Public Key</strong></div>
+          <div class="detail-row">Use as credenciais de <strong>teste</strong> primeiro — o MercadoPago tem ambiente sandbox completo</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">mercadopago</span></div>
+          <div class="detail-row">Adicione no <strong>.env.local</strong>: MP_ACCESS_TOKEN e NEXT_PUBLIC_MP_PUBLIC_KEY</div>
         </div>
       </div>
 
@@ -407,12 +462,26 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p2-3" title="Marcar como concluído">
           <div class="step-idx">3</div>
-          <div class="step-info"><div class="step-name">Criar a rota de API de checkout</div><div class="step-desc">/api/checkout — recebe pedido e cria preferência</div></div>
+          <div class="step-info"><div class="step-name">Criar a rota de API de checkout</div><div class="step-desc">/api/checkout — recebe pedido e cria preferência de pagamento</div></div>
           <span class="step-badge tag-orange">Crítico</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Receba o carrinho via POST, crie preferência e retorne o ID.</div>
+          <div class="detail-row">Crie o arquivo <strong>/app/api/checkout/route.ts</strong></div>
+          <div class="cmd"><span class="cm">// Recebe os itens do carrinho e cria preferência no MP</span><br>
+<span class="kw">import</span> MercadoPagoConfig, { Preference } from <span class="str">'mercadopago'</span><br><br>
+<span class="kw">export async function</span> POST(req) {<br>
+&nbsp;&nbsp;<span class="kw">const</span> { items, customer } = <span class="kw">await</span> req.json()<br>
+&nbsp;&nbsp;<span class="kw">const</span> mp = <span class="kw">new</span> MercadoPagoConfig({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;accessToken: process.env.MP_ACCESS_TOKEN<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<span class="kw">const</span> pref = <span class="kw">await new</span> Preference(mp).create({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;body: { items, payer: customer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;back_urls: { success: <span class="str">'/pedido/sucesso'</span> } }<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<span class="kw">return</span> Response.json({ id: pref.id })<br>
+}</div>
+          <div class="tip">O MercadoPago redireciona o cliente para a página deles para pagar e depois volta para sua URL de sucesso. Simples e seguro.</div>
         </div>
       </div>
 
@@ -420,12 +489,15 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p2-4" title="Marcar como concluído">
           <div class="step-idx">4</div>
-          <div class="step-info"><div class="step-name">Webhook — confirmar pagamento</div><div class="step-desc">MercadoPago avisa seu site quando o pagamento é aprovado</div></div>
-          <span class="step-badge tag-orange">Crítico</span>
+          <div class="step-info"><div class="step-name">Webhook — confirmar pagamento e salvar pedido</div><div class="step-desc">MercadoPago avisa seu site quando o pagamento é aprovado</div></div>
+          <span class="step-badge tag-orange">Não pule isso</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="warn">Atenção: sem o webhook configurado, você nunca saberá se o pagamento foi aprovado no seu sistema.</div>
+          <div class="detail-row">Crie <strong>/app/api/webhook/route.ts</strong> — o MercadoPago vai chamar essa URL quando o pagamento for confirmado</div>
+          <div class="detail-row">Nessa rota: valide a assinatura do MP, busque os detalhes do pagamento pela API do MP, salve o pedido no Supabase com status "pago" e atualize o estoque</div>
+          <div class="detail-row">Configure a URL do webhook no painel do MercadoPago em <strong>Configurações → Notificações → Webhooks</strong></div>
+          <div class="warn"><strong>Atenção:</strong> sem o webhook, você nunca saberá se o pagamento foi aprovado. É o passo mais crítico de toda a integração de pagamentos.</div>
         </div>
       </div>
 
@@ -433,12 +505,17 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p2-5" title="Marcar como concluído">
           <div class="step-idx">5</div>
-          <div class="step-info"><div class="step-name">Carrinho de compras no front-end</div><div class="step-desc">Estado global com Zustand</div></div>
+          <div class="step-info"><div class="step-name">Carrinho de compras no front-end</div><div class="step-desc">Estado global com Zustand — persiste entre páginas</div></div>
           <span class="step-badge tag-outline">Front-end</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Use Zustand para salvar os itens e persistir via `localStorage`.</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">zustand</span></div>
+          <div class="detail-row">Crie <strong>/store/cartStore.ts</strong> com Zustand para gerenciar os itens do carrinho</div>
+          <div class="detail-row">Estado do carrinho: lista de itens, total, adicionar, remover, limpar</div>
+          <div class="detail-row">Use <strong>localStorage persist</strong> do Zustand para o carrinho não sumir ao recarregar a página</div>
+          <div class="detail-row">Crie o componente <strong>CartDrawer.tsx</strong> — painel lateral que desliza com os itens e botão de finalizar compra</div>
+          <div class="tip">Zustand é simples de usar e se integra perfeitamente com Next.js. Muito mais fácil que Redux para este caso.</div>
         </div>
       </div>
 
@@ -461,11 +538,23 @@ body {
           <input type="checkbox" class="step-check" id="chk-p3-1" title="Marcar como concluído">
           <div class="step-idx">1</div>
           <div class="step-info"><div class="step-name">Estrutura do painel /admin</div><div class="step-desc">Rota protegida com layout próprio</div></div>
-          <span class="step-badge tag-blue">Estrutura</span>
+          <span class="step-badge tag-orange">Estrutura</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Crie rotas filhas para Produtos, Pedidos e Clientes isoladas do site principal.</div>
+          <div class="detail-row">Crie o grupo de rotas <strong>/app/admin/</strong> com layout próprio (sidebar + header) separado do layout público da loja</div>
+          <div class="detail-row">Estrutura de páginas do admin:</div>
+          <div class="cmd">/app/admin/<br>
+&nbsp;&nbsp;layout.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← sidebar + proteção de rota</span><br>
+&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← dashboard com métricas</span><br>
+&nbsp;&nbsp;produtos/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← lista de produtos</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;novo/page.tsx <span class="cm">← formulário de novo produto</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[id]/page.tsx <span class="cm">← editar produto</span><br>
+&nbsp;&nbsp;pedidos/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← todos os pedidos</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[id]/page.tsx <span class="cm">← detalhe do pedido</span><br>
+&nbsp;&nbsp;clientes/page.tsx <span class="cm">← lista de clientes</span></div>
         </div>
       </div>
 
@@ -473,12 +562,16 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p3-2" title="Marcar como concluído">
           <div class="step-idx">2</div>
-          <div class="step-info"><div class="step-name">Tela de dashboard</div><div class="step-desc">Visão geral de vendas, pedidos e produtos</div></div>
-          <span class="step-badge tag-outline">Visual</span>
+          <div class="step-info"><div class="step-name">Tela de dashboard — métricas em tempo real</div><div class="step-desc">Visão geral de vendas, pedidos e produtos</div></div>
+          <span class="step-badge tag-blue">Visual</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Use Recharts para gráficos e cards de métricas (Ticket médio, Total Mês).</div>
+          <div class="detail-row">Cards de métricas no topo: <strong>Receita do mês</strong>, <strong>Pedidos hoje</strong>, <strong>Ticket médio</strong>, <strong>Produtos ativos</strong></div>
+          <div class="detail-row">Gráfico de vendas dos últimos 30 dias (usar <strong>Recharts</strong> — já vem com o shadcn/ui)</div>
+          <div class="detail-row">Tabela dos 5 últimos pedidos com status colorido (pendente/pago/enviado/entregue)</div>
+          <div class="detail-row">Alertas: produtos com estoque baixo (abaixo de 5 unidades)</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">recharts</span></div>
         </div>
       </div>
 
@@ -486,12 +579,17 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p3-3" title="Marcar como concluído">
           <div class="step-idx">3</div>
-          <div class="step-info"><div class="step-name">Gestão de produtos (CRUD)</div><div class="step-desc">Criar, editar, ativar e deletar produtos</div></div>
+          <div class="step-info"><div class="step-name">Gestão de produtos — CRUD completo</div><div class="step-desc">Criar, editar, ativar e deletar produtos</div></div>
           <span class="step-badge tag-orange">Essencial</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Tabela paginada + formulário integrado com React Hook Form.</div>
+          <div class="detail-row">Tabela paginada com todos os produtos: imagem, nome, preço, estoque, status ativo/inativo</div>
+          <div class="detail-row">Formulário de novo produto com os campos: nome, slug (auto-gerado), descrição, preço, preço original, estoque, categoria, imagens</div>
+          <div class="detail-row">Upload de imagens via <strong>Supabase Storage</strong> — drag-and-drop direto no formulário</div>
+          <div class="detail-row">Botão de ativar/desativar produto sem deletar (soft delete)</div>
+          <div class="tip">Use o componente <strong>shadcn/ui Form</strong> com <strong>react-hook-form</strong> e <strong>zod</strong> para validação — economiza muito tempo.</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">react-hook-form zod @hookform/resolvers</span></div>
         </div>
       </div>
 
@@ -504,7 +602,12 @@ body {
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Página individual do pedido com opção de alterar status (Enviado, Entregue) e inserir rastreio.</div>
+          <div class="detail-row">Tabela de pedidos com filtro por status: <strong>Pendente / Pago / Enviado / Entregue / Cancelado</strong></div>
+          <div class="detail-row">Página individual do pedido: itens comprados, dados do cliente, endereço de entrega, método de pagamento, histórico de status</div>
+          <div class="detail-row">Botão para atualizar status manualmente (ex: marcar como enviado e adicionar código de rastreio)</div>
+          <div class="detail-row">Campo de código de rastreio — quando preenchido, o cliente recebe e-mail automático com o código</div>
+          <div class="tip">Para envio de e-mail, use <strong>Resend</strong> (gratuito até 3.000 e-mails/mês) + <strong>React Email</strong> para montar templates bonitos em JSX.</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">resend react-email</span></div>
         </div>
       </div>
 
@@ -531,7 +634,12 @@ body {
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Conecte o GitHub à Vercel e insira as variáveis `.env`.</div>
+          <div class="detail-row">Suba o código para o <strong>GitHub</strong> em um repositório privado</div>
+          <div class="detail-row">Acesse <strong>vercel.com</strong>, conecte com o GitHub e importe o repositório</div>
+          <div class="detail-row">Adicione todas as variáveis do <strong>.env.local</strong> no painel de Environment Variables da Vercel</div>
+          <div class="detail-row">A Vercel detecta Next.js automaticamente e configura o build sem precisar mexer em nada</div>
+          <div class="detail-row">Após o deploy, você terá uma URL como <strong>golden-pets.vercel.app</strong> para testar</div>
+          <div class="tip">A cada vez que você fizer push para a branch main, a Vercel faz deploy automático. Branches diferentes viram previews com URL própria.</div>
         </div>
       </div>
 
@@ -539,12 +647,16 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p4-2" title="Marcar como concluído">
           <div class="step-idx">2</div>
-          <div class="step-info"><div class="step-name">Comprar domínio .com.br</div><div class="step-desc">Passa credibilidade para a loja</div></div>
+          <div class="step-info"><div class="step-name">Comprar domínio .com.br</div><div class="step-desc">goldenpets.com.br passa credibilidade</div></div>
           <span class="step-badge tag-outline">~R$ 40/ano</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Registre no Registro.br e aponte os DNS CNAME para a Vercel.</div>
+          <div class="detail-row">Registre em <strong>registro.br</strong> (oficial) ou <strong>Hostinger</strong> (mais barato com hospedagem)</div>
+          <div class="detail-row">Após comprar, no DNS do domínio adicione um registro <strong>CNAME</strong> apontando para <strong>cname.vercel-dns.com</strong></div>
+          <div class="detail-row">Na Vercel em <strong>Settings → Domains</strong> adicione o domínio personalizado</div>
+          <div class="detail-row">A Vercel gera o <strong>certificado SSL (HTTPS)</strong> automaticamente e de graça</div>
+          <div class="tip">Domínio .com.br transmite muito mais confiança para o consumidor brasileiro do que .vercel.app ou .com.</div>
         </div>
       </div>
 
@@ -552,12 +664,15 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p4-3" title="Marcar como concluído">
           <div class="step-idx">3</div>
-          <div class="step-info"><div class="step-name">Variáveis de Produção</div><div class="step-desc">Separar ambiente de teste do ambiente real</div></div>
-          <span class="step-badge tag-orange">Crítico</span>
+          <div class="step-info"><div class="step-name">Configurar variáveis de ambiente de produção</div><div class="step-desc">Separar ambiente de teste do ambiente real</div></div>
+          <span class="step-badge tag-orange">Não esqueça</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Troque as keys do MercadoPago e ative o RLS no Supabase.</div>
+          <div class="detail-row">No MercadoPago: troque as credenciais de <strong>teste</strong> pelas de <strong>produção</strong> nas variáveis da Vercel</div>
+          <div class="detail-row">No Supabase: confirme que o projeto está com Row Level Security (RLS) ativado nas tabelas públicas</div>
+          <div class="detail-row">Configure as URLs de retorno do MercadoPago para o domínio real (não mais localhost)</div>
+          <div class="warn"><strong>Nunca</strong> coloque credenciais de produção no .env.local ou no GitHub. Use apenas nas variáveis de ambiente da Vercel.</div>
         </div>
       </div>
 
@@ -568,7 +683,7 @@ body {
     <div class="ph-header">
       <div class="ph-num">5</div>
       <div>
-        <div class="ph-title">Pré-lançamento</div>
+        <div class="ph-title">Pré-lançamento e primeiras vendas</div>
         <div class="ph-sub">Checklist final antes de divulgar · ~3 dias</div>
         <div class="ph-progress-text" id="ph-prog-4">0/3 concluídos</div>
       </div>
@@ -584,7 +699,11 @@ body {
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Políticas de Privacidade, Trocas/Devoluções e Termos de Uso.</div>
+          <div class="detail-row"><strong>Política de Privacidade</strong> — obrigatória pela LGPD. Descreve quais dados você coleta e como usa</div>
+          <div class="detail-row"><strong>Termos de Uso</strong> — regras de uso da loja, limitação de responsabilidade</div>
+          <div class="detail-row"><strong>Política de Trocas e Devoluções</strong> — o Código de Defesa do Consumidor garante 7 dias de arrependimento</div>
+          <div class="detail-row"><strong>Informações de entrega</strong> — prazo estimado, transportadoras utilizadas</div>
+          <div class="tip">Use o gerador gratuito de termos do <strong>Jusbrasil</strong> ou <strong>LegalFind</strong> como base — adapte com os dados da sua loja.</div>
         </div>
       </div>
 
@@ -592,12 +711,17 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p5-2" title="Marcar como concluído">
           <div class="step-idx">2</div>
-          <div class="step-info"><div class="step-name">Testar o fluxo completo</div><div class="step-desc">Do produto até o pedido salvo no banco</div></div>
+          <div class="step-info"><div class="step-name">Testar o fluxo de compra completo</div><div class="step-desc">Do produto até o pedido salvo no banco</div></div>
           <span class="step-badge tag-orange">Não pule</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Use os cartões de teste do MercadoPago e veja se o Webhook salva o pedido.</div>
+          <div class="detail-row">Use os <strong>cartões de teste do MercadoPago</strong> para simular uma compra aprovada, recusada e pendente</div>
+          <div class="detail-row">Confirme que o pedido aparece no banco de dados após o pagamento aprovado</div>
+          <div class="detail-row">Confirme que o e-mail de confirmação chega na caixa do cliente</div>
+          <div class="detail-row">Confirme que o dashboard admin mostra o pedido e que você consegue atualizar o status</div>
+          <div class="detail-row">Teste no celular — a maioria das compras no Brasil é feita pelo mobile</div>
+          <div class="warn">Se o webhook não funcionar em produção, nenhum pedido será registrado. Teste isso antes de divulgar.</div>
         </div>
       </div>
 
@@ -605,12 +729,16 @@ body {
         <div class="step-head" onclick="tog(this)">
           <input type="checkbox" class="step-check" id="chk-p5-3" title="Marcar como concluído">
           <div class="step-idx">3</div>
-          <div class="step-info"><div class="step-name">SEO básico e Google Analytics</div><div class="step-desc">Aparecer no Google e monitorar visitas</div></div>
+          <div class="step-info"><div class="step-name">SEO básico e Google Analytics</div><div class="step-desc">Para aparecer no Google e saber de onde vêm as visitas</div></div>
           <span class="step-badge tag-blue">Grátis</span>
           <span class="arrow">▼</span>
         </div>
         <div class="step-body">
-          <div class="detail-row">Configure `generateMetadata`, Sitemap e o script do GA4.</div>
+          <div class="detail-row">Configure o <strong>generateMetadata</strong> do Next.js em cada página com title e description únicos</div>
+          <div class="detail-row">Crie o arquivo <strong>sitemap.ts</strong> em /app para gerar o sitemap automaticamente</div>
+          <div class="detail-row">Registre o site no <strong>Google Search Console</strong> e envie o sitemap</div>
+          <div class="detail-row">Instale o <strong>Google Analytics 4</strong> via script no layout.tsx ou via next/script</div>
+          <div class="tip">Com o Search Console você consegue ver em quais buscas do Google seu site aparece — fundamental para otimizar.</div>
         </div>
       </div>
 
@@ -627,11 +755,23 @@ body {
       <div class="cost-card"><div class="cost-label">Vercel</div><div class="cost-val free">R$ 0</div><div class="cost-note">Hobby plan gratuito</div></div>
       <div class="cost-card"><div class="cost-label">Domínio .com.br</div><div class="cost-val">~R$ 40</div><div class="cost-note">Por ano, no registro.br</div></div>
       <div class="cost-card"><div class="cost-label">MercadoPago</div><div class="cost-val">~4,49%</div><div class="cost-note">Só paga quando vende</div></div>
+      <div class="cost-card"><div class="cost-label">Resend (email)</div><div class="cost-val free">R$ 0</div><div class="cost-note">Grátis até 3k emails/mês</div></div>
+      <div class="cost-card"><div class="cost-label">SSL (HTTPS)</div><div class="cost-val free">R$ 0</div><div class="cost-note">Vercel gera grátis</div></div>
     </div>
     
     <div class="summary-box">
       <div class="summary-box-title">Total para lançar: R$ 40/ano</div>
-      <div class="summary-box-text">Você consegue ter uma loja completa com banco de dados, painel admin, pagamentos e domínio próprio gastando quase nada para iniciar.</div>
+      <div class="summary-box-text">Você consegue ter uma loja completa com banco de dados, painel admin, pagamentos e domínio próprio gastando apenas R$ 40 no primeiro ano. Tudo o mais só começa a custar quando você escalar.</div>
+    </div>
+
+    <div class="future-box">
+      <div class="future-box-title">Quando começa a crescer — próximos custos</div>
+      <div class="future-box-text">
+        &bull; Supabase Pro: US$25/mês (quando passar de 500MB)<br>
+        &bull; Vercel Pro: US$20/mês (se precisar de mais builds ou domínios)<br>
+        &bull; Pagar.me (em vez do MP): taxa menor a partir de 50+ pedidos/mês<br>
+        &bull; Shopify Storefront API: quando quiser delegar o estoque para o Shopify
+      </div>
     </div>
   </div>
 </div>
@@ -714,7 +854,7 @@ function calculateProgress() {
       const phProgElement = document.getElementById(phProgId);
       if (phProgElement) {
         phProgElement.innerText = `${phaseDone}/${phaseChecks.length} concluídos`;
-        // Destacar em verde se a fase estiver 100%
+        // Destacar em azul (como completo) ou laranja (em andamento)
         if(phaseDone === phaseChecks.length) {
             phProgElement.style.backgroundColor = 'var(--blue-main)';
             phProgElement.style.color = 'white';

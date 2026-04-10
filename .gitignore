@@ -9,8 +9,14 @@ next.user-config.*
 
 # Environment variables
 .env*.local
+.env
+.env.*
+out/
 
 # Common ignores
 node_modules
 .next/
+.DS_Store
+
+*.log
 .DS_Store

@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="public/icon.svg" width="80" height="80" alt="Golden Pets Logo" />
-
 # 🐾 Golden Pets
 
 **E-commerce moderno para produtos pet, feito com Next.js e Supabase**

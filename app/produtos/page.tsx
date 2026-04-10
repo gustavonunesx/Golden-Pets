@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { getProducts } from '@/lib/queries/products'
 import { Navbar } from '@/components/sections/Navbar'
 import { Footer } from '@/components/sections/Footer'
 import { ProductsGrid } from '@/components/sections/ProductsGrid'
@@ -8,11 +9,13 @@ export const metadata: Metadata = {
   description: 'Confira todos os produtos premium para seu pet. Coleiras, camas, brinquedos, alimentacao e muito mais com entrega rapida para todo o Brasil.'
 }
 
-export default function ProdutosPage() {
+export default async function ProdutosPage() {
+  const products = await getProducts()
+
   return (
     <main className="min-h-screen">
       <Navbar />
-      <ProductsGrid />
+      <ProductsGrid products={products} />
       <Footer />
     </main>
   )

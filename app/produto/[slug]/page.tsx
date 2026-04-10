@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { products } from '@/data/products'
+import { getProducts, getProductBySlug, getProductsByCategory } from '@/lib/queries/products'
 import { Navbar } from '@/components/sections/Navbar'
 import { Footer } from '@/components/sections/Footer'
 import { ProductDetail } from '@/components/sections/ProductDetail'
@@ -11,6 +11,7 @@ interface ProductPageProps {
 }
 
 export async function generateStaticParams() {
+  const products = await getProducts()
   return products.map((product) => ({
     slug: product.slug
   }))
@@ -18,7 +19,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params
-  const product = products.find((p) => p.slug === slug)
+  const product = await getProductBySlug(slug)
 
   if (!product) {
     return {
@@ -34,15 +35,13 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-  const product = products.find((p) => p.slug === slug)
+  const product = await getProductBySlug(slug)
 
   if (!product) {
     notFound()
   }
 
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4)
+  const relatedProducts = await getProductsByCategory(product.category, product.id)
 
   return (
     <main className="min-h-screen">

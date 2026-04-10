@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, User } from 'lucide-react'
 import { AuthModal } from '@/components/sections/AuthModal'
+import { CartDrawer } from '@/components/sections/CartDrawer'
+import { CartButton } from '@/components/ui/cart-button'
 
 const navLinks = [
   { href: '/produtos', label: 'Produtos' },
@@ -18,6 +20,7 @@ export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [authOpen, setAuthOpen] = useState(false)
   const [authTab, setAuthTab] = useState<'login' | 'register'>('login')
+  const [cartOpen, setCartOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -82,6 +85,7 @@ export function Navbar() {
 
             {/* Desktop Auth Buttons */}
             <div className="hidden md:flex items-center gap-3">
+              <CartButton onClick={() => setCartOpen(true)} />
               <motion.button
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
@@ -101,14 +105,17 @@ export function Navbar() {
               </motion.button>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-800"
-              aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
-            >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile Cart + Menu */}
+            <div className="flex items-center gap-2 md:hidden">
+              <CartButton onClick={() => setCartOpen(true)} />
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-gray-800"
+                aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -158,6 +165,8 @@ export function Navbar() {
         onClose={() => setAuthOpen(false)}
         defaultTab={authTab}
       />
+
+      <CartDrawer open={cartOpen} onOpenChange={setCartOpen} />
     </>
   )
 }

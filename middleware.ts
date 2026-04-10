@@ -1,4 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/middleware'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { NextResponse, type NextRequest } from 'next/server'
 
 // ─── Rotas que exigem estar LOGADO como admin ───────────────────────────────
@@ -22,56 +23,26 @@ const PUBLIC_ROUTES = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ── 1. Cria a response base que pode ser modificada ──────────────────────
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  })
+  // ── 1. Cria o client do Supabase com suporte a cookies (SSR) ─────────────
+  const { supabase, response } = createClient(request)
 
-  // ── 2. Cria o client do Supabase com suporte a cookies (SSR) ─────────────
-  //    Necessário para o middleware conseguir ler a sessão do usuário
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          // Atualiza os cookies tanto na request quanto na response
-          // Isso é necessário para renovar o token de sessão automaticamente
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
-          response = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
-
-  // ── 3. Verifica se a rota atual é uma rota de admin ──────────────────────
+  // ── 2. Verifica se a rota atual é uma rota de admin ──────────────────────
   const isAdminRoute = pathname.startsWith(ADMIN_ROUTES)
+  const isAdminPublic = pathname === '/admin/login' || pathname === '/403'
 
-  // ── 4. Se não for rota admin, deixa passar sem verificação ───────────────
-  if (!isAdminRoute) {
+  // ── 3. Se não for rota admin, ou for página pública do admin, deixa passar
+  if (!isAdminRoute || isAdminPublic) {
     return response
   }
 
-  // ── 5. Rota admin detectada — verifica a sessão do usuário ───────────────
+  // ── 4. Rota admin detectada — verifica a sessão do usuário ───────────────
   //    getUser() é mais seguro que getSession() pois valida com o servidor
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser()
 
-  // ── 6. Sem usuário logado → redireciona para o login ─────────────────────
+  // ── 5. Sem usuário logado → redireciona para o login ─────────────────────
   if (authError || !user) {
     const loginUrl = new URL('/admin/login', request.url)
     // Salva a URL original para redirecionar de volta após o login
@@ -79,25 +50,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  // ── 7. Usuário logado, mas precisa verificar se é ADMIN ──────────────────
+  // ── 6. Usuário logado, mas precisa verificar se é ADMIN ──────────────────
   //    Usamos a service_role key aqui para burlar o RLS e consultar admin_users
   //    ATENÇÃO: essa key nunca vai para o navegador — está só no servidor
-  const supabaseAdmin = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
-          )
-        },
-      },
-    }
-  )
+  const supabaseAdmin = createAdminClient()
 
   const { data: adminRecord, error: adminError } = await supabaseAdmin
     .from('admin_users')
@@ -105,13 +61,13 @@ export async function middleware(request: NextRequest) {
     .eq('id', user.id)
     .single()
 
-  // ── 8. Usuário autenticado mas NÃO é admin → redireciona para 403 ────────
+  // ── 7. Usuário autenticado mas NÃO é admin → redireciona para 403 ────────
   if (adminError || !adminRecord) {
     const forbiddenUrl = new URL('/403', request.url)
     return NextResponse.redirect(forbiddenUrl)
   }
 
-  // ── 9. É admin: injeta o role no header para as Server Components usarem ─
+  // ── 8. É admin: injeta o role no header para as Server Components usarem ─
   //    Assim as páginas sabem o role sem precisar fazer nova query
   response.headers.set('x-admin-role', adminRecord.role)
   response.headers.set('x-user-id', user.id)

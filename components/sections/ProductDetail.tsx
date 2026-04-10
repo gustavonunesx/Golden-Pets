@@ -7,7 +7,9 @@ import {
   Star, Check, Truck, ShieldCheck, RotateCcw, Minus, Plus,
   ChevronRight, Upload, X, Camera, Video,
 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { Product } from '@/types'
+import { useCartStore } from '@/stores/cart-store'
 import { CustomBadge } from '@/components/ui/custom-badge'
 import { CustomButton } from '@/components/ui/custom-button'
 import { ProductImage } from '@/components/ui/product-image'
@@ -62,6 +64,8 @@ const compressImage = (file: File): Promise<string> =>
   })
 
 export function ProductDetail({ product }: ProductDetailProps) {
+  const router = useRouter()
+  const addItem = useCartStore((s) => s.addItem)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState<TabType>('descricao')
 
@@ -301,10 +305,38 @@ export function ProductDetail({ product }: ProductDetailProps) {
 
             {/* CTA Buttons */}
             <motion.div variants={fadeUp} className="space-y-3 mb-8">
-              <CustomButton variant="primary" size="lg" className="w-full">
+              <CustomButton
+                variant="primary"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  addItem({
+                    productId: product.id,
+                    slug: product.slug,
+                    name: product.name,
+                    price: product.price,
+                    imageColor: product.imageColor,
+                  }, quantity)
+                  setQuantity(1)
+                }}
+              >
                 Adicionar ao carrinho
               </CustomButton>
-              <CustomButton variant="ghost" size="lg" className="w-full">
+              <CustomButton
+                variant="ghost"
+                size="lg"
+                className="w-full"
+                onClick={() => {
+                  addItem({
+                    productId: product.id,
+                    slug: product.slug,
+                    name: product.name,
+                    price: product.price,
+                    imageColor: product.imageColor,
+                  }, quantity)
+                  router.push('/checkout')
+                }}
+              >
                 Comprar agora
               </CustomButton>
             </motion.div>

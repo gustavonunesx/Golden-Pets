@@ -3,14 +3,16 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
-import { products } from '@/data/products'
+import { Product } from '@/types'
 import { ProductCard } from '@/components/ui/product-card'
 import { CustomButton } from '@/components/ui/custom-button'
 import { fadeUp, staggerContainer } from '@/lib/animations'
 
-export function FeaturedProducts() {
-  // Show first 8 products for the homepage
-  const featuredProducts = products.slice(0, 8)
+interface FeaturedProductsProps {
+  products: Product[]
+}
+
+export function FeaturedProducts({ products: featuredProducts }: FeaturedProductsProps) {
 
   return (
     <section className="py-20 bg-white">

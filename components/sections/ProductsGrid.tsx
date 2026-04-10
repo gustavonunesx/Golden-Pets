@@ -1,11 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { products } from '@/data/products'
+import { Product } from '@/types'
 import { ProductCard } from '@/components/ui/product-card'
 import { fadeUp, staggerContainer } from '@/lib/animations'
 
-export function ProductsGrid() {
+interface ProductsGridProps {
+  products: Product[]
+}
+
+export function ProductsGrid({ products }: ProductsGridProps) {
   return (
     <section className="py-32 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

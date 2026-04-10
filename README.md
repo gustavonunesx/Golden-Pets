@@ -14,11 +14,11 @@
 
 ---
 
-## 📖 Sobre o Projeto
+## Sobre o Projeto
 
 Golden Pets é uma loja virtual completa voltada para produtos pet, construída com as tecnologias mais modernas do ecossistema React. O projeto conta com vitrine de produtos, carrinho de compras persistente, autenticação de usuários e painel administrativo protegido.
 
-### ✨ Funcionalidades
+### Funcionalidades
 
 - 🛍️ **Catálogo de produtos** com página de detalhes e slugs amigáveis
 - 🛒 **Carrinho de compras** persistente via Zustand + localStorage
@@ -32,7 +32,7 @@ Golden Pets é uma loja virtual completa voltada para produtos pet, construída 
 
 ---
 
-## 🚀 Como Iniciar
+## Como Iniciar
 
 ### Pré-requisitos
 
@@ -74,7 +74,7 @@ MP_WEBHOOK_SECRET=seu_webhook_secret
 RESEND_API_KEY=sua_resend_api_key
 ```
 
-> 💡 **Sem Supabase?** O projeto funciona normalmente com produtos e depoimentos hardcoded em `data/`. Configure o Supabase apenas quando quiser persistência real.
+> **Sem Supabase?** O projeto funciona normalmente com produtos e depoimentos hardcoded em `data/`. Configure o Supabase apenas quando quiser persistência real.
 
 ### 4. Inicie o servidor de desenvolvimento
 
@@ -88,7 +88,7 @@ Acesse [http://localhost:3000](http://localhost:3000) no navegador. 🎉
 
 ---
 
-## 🗂️ Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 golden-pets/
@@ -123,7 +123,7 @@ golden-pets/
 
 ---
 
-## 🛠️ Scripts Disponíveis
+## Scripts Disponíveis
 
 | Comando | Descrição |
 |---|---|
@@ -134,7 +134,7 @@ golden-pets/
 
 ---
 
-## 🗄️ Banco de Dados (Supabase)
+## Banco de Dados (Supabase)
 
 O projeto utiliza **8 tabelas** com RLS habilitado em todas:
 
@@ -151,7 +151,7 @@ O projeto utiliza **8 tabelas** com RLS habilitado em todas:
 
 ---
 
-## 🔒 Segurança
+## Segurança
 
 - `SUPABASE_SERVICE_ROLE_KEY` usada **somente no servidor** (middleware e API routes)
 - Preços dos produtos sempre validados no servidor, nunca confiados do front-end
@@ -161,7 +161,7 @@ O projeto utiliza **8 tabelas** com RLS habilitado em todas:
 
 ---
 
-## 🧰 Tecnologias
+## Tecnologias
 
 | Categoria | Tecnologia |
 |---|---|
@@ -178,7 +178,7 @@ O projeto utiliza **8 tabelas** com RLS habilitado em todas:
 
 ---
 
-## 📄 Licença
+## Licença
 
 Este projeto é privado e de uso pessoal/comercial do autor.
 

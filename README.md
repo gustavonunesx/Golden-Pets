@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🐾 Golden Pets
+# Golden Pets
 
 **E-commerce moderno para produtos pet, feito com Next.js e Supabase**
 
@@ -185,7 +185,5 @@ Este projeto é privado e de uso pessoal/comercial do autor.
 ---
 
 <div align="center">
-
-Feito com ❤️ e muitas 🐾
 
 </div>

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roadmap Golden Pets</title>
+<style>
+:root {
+  /* Paleta Base: Branco, Laranja e Azul */
+  --bg-body: #f1f5f9; /* Fundo geral levemente cinza/azulado para destacar o container branco */
+  --bg-white: #ffffff;
+  
+  --orange-main: #f97316;
+  --orange-light: #fff7ed;
+  --orange-dark: #c2410c;
+  
+  --blue-main: #2563eb;
+  --blue-light: #eff6ff;
+  --blue-dark: #1d4ed8;
+  --blue-code: #0f172a; /* Azul muito escuro para blocos de código */
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  
+  --border-color: #e2e8f0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+  font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  padding: 2rem 1rem;
+}
+
+.wrap { 
+  max-width: 800px; 
+  margin: 0 auto; 
+  background-color: var(--bg-white);
+  padding: 2.5rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.05), 0 8px 10px -6px rgba(37, 99, 235, 0.01);
+}
+
+.phase-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 2rem; }
+
+.pnav { 
+  background: var(--bg-white); 
+  border: 1.5px solid var(--border-color); 
+  border-radius: 24px; 
+  padding: 8px 18px; 
+  font-size: 13px; 
+  font-weight: 600;
+  cursor: pointer; 
+  color: var(--text-secondary); 
+  transition: all 0.3s ease;
+}
+
+.pnav:hover {
+  border-color: var(--blue-main);
+  color: var(--blue-main);
+}
+
+.pnav.active { 
+  background: var(--orange-main); 
+  color: var(--bg-white); 
+  border-color: var(--orange-main);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+
+.progress-bar { 
+  height: 6px; 
+  background: var(--blue-light); 
+  border-radius: 4px; 
+  margin-bottom: 2.5rem; 
+  overflow: hidden;
+}
+
+.progress-fill { 
+  height: 100%; 
+  background: var(--blue-main); 
+  border-radius: 4px; 
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.phase { display: none; animation: fadeIn 0.4s ease; }
+.phase.on { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ph-header { display: flex; align-items: center; gap: 16px; margin-bottom: 2rem; }
+
+.ph-num { 
+  width: 54px; height: 54px; 
+  border-radius: 14px; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 22px; font-weight: 800; flex-shrink: 0;
+  background: var(--blue-light);
+  color: var(--blue-main);
+  border: 2px solid rgba(37, 99, 235, 0.1);
+}
+
+.ph-title { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.ph-sub { font-size: 14px; color: var(--text-secondary); margin-top: 4px; }
+
+.step-list { display: flex; flex-direction: column; gap: 14px; }
+
+.step { 
+  background: var(--bg-white); 
+  border: 1.5px solid var(--border-color); 
+  border-radius: 12px; 
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.step:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.step-head { 
+  display: flex; align-items: center; gap: 14px; 
+  padding: 16px; cursor: pointer; user-select: none;
+}
+
+.step-idx { 
+  width: 32px; height: 32px; 
+  border-radius: 50%; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+  background: var(--orange-light);
+  color: var(--orange-main);
+}
+
+.step-info { flex: 1; }
+.step-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.step-desc { font-size: 13px; color: var(--text-tertiary); margin-top: 3px; }
+
+/* Tags padronizadas nas cores do tema */
+.step-badge { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; }
+.tag-blue { background: var(--blue-light); color: var(--blue-dark); }
+.tag-orange { background: var(--orange-light); color: var(--orange-dark); }
+.tag-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+
+.step-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border-color); margin-top: 4px; padding-top: 16px;}
+.step-body.open { display: block; animation: fadeIn 0.3s ease; }
+
+.cmd { 
+  background: var(--blue-code); 
+  color: #e2e8f0; 
+  border-radius: 8px; 
+  padding: 12px 16px; 
+  font-family: 'Fira Code', monospace; 
+  font-size: 13px; 
+  margin: 12px 0; 
+  overflow-x: auto;
+  line-height: 1.5;
+}
+.cmd .cm { color: #94a3b8; font-style: italic; }
+.cmd .kw { color: #60a5fa; } /* Azul claro para keywords */
+.cmd .str { color: #fb923c; } /* Laranja para strings */
+
+.detail-row { font-size: 14px; color: var(--text-secondary); padding: 8px 0; line-height: 1.6; border-bottom: 1px solid #f1f5f9; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row strong { color: var(--text-primary); font-weight: 600; }
+
+.tip { 
+  background: var(--blue-light); 
+  border-left: 4px solid var(--blue-main); 
+  border-radius: 0 8px 8px 0; 
+  padding: 12px 16px; 
+  margin-top: 12px; 
+  font-size: 13px; 
+  color: var(--blue-dark); 
+  line-height: 1.6; 
+}
+
+.warn { 
+  background: var(--orange-light); 
+  border-left: 4px solid var(--orange-main); 
+  border-radius: 0 8px 8px 0; 
+  padding: 12px 16px; 
+  margin-top: 12px; 
+  font-size: 13px; 
+  color: var(--orange-dark); 
+  line-height: 1.6; 
+}
+
+.cost-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+.cost-card { 
+  background: var(--bg-body); 
+  border: 1px solid var(--border-color);
+  border-radius: 10px; 
+  padding: 16px; 
+}
+.cost-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;}
+.cost-val { font-size: 20px; font-weight: 700; color: var(--blue-main); }
+.cost-val.free { color: var(--orange-main); }
+.cost-note { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+
+.summary-box { background: var(--blue-light); border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid rgba(37, 99, 235, 0.1); }
+.summary-box-title { font-size: 16px; font-weight: 700; color: var(--blue-dark); margin-bottom: 8px; }
+.summary-box-text { font-size: 14px; color: var(--blue-dark); line-height: 1.6; }
+
+.future-box { background: var(--orange-light); border-radius: 12px; padding: 20px; margin-top: 16px; border: 1px solid rgba(249, 115, 22, 0.1); }
+.future-box-title { font-size: 15px; font-weight: 700; color: var(--orange-dark); margin-bottom: 8px; }
+.future-box-text { font-size: 13px; color: var(--orange-dark); line-height: 1.7; }
+
+.arrow { font-size: 12px; color: var(--text-tertiary); transition: transform 0.3s ease; margin-left: auto; }
+.step-head.opened .arrow { transform: rotate(180deg); color: var(--blue-main); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h2 style="position:absolute;width:1px;height:1px;overflow:hidden">Roadmap completo para colocar a Golden Pets no ar</h2>
+
+  <div class="phase-nav">
+    <button class="pnav active" onclick="goPhase(0,this)">Fase 1 — Backend</button>
+    <button class="pnav" onclick="goPhase(1,this)">Fase 2 — Pagamentos</button>
+    <button class="pnav" onclick="goPhase(2,this)">Fase 3 — Dashboard</button>
+    <button class="pnav" onclick="goPhase(3,this)">Fase 4 — Deploy</button>
+    <button class="pnav" onclick="goPhase(4,this)">Fase 5 — Lançamento</button>
+    <button class="pnav" onclick="goPhase(5,this)">Custos</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:20%"></div></div>
+
+  <div id="phase-0" class="phase on">
+    <div class="ph-header">
+      <div class="ph-num">1</div>
+      <div><div class="ph-title">Banco de dados e autenticação</div><div class="ph-sub">Supabase — gratuito até 500MB · ~1 semana de trabalho</div></div>
+    </div>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">1</div>
+          <div class="step-info"><div class="step-name">Criar conta e projeto no Supabase</div><div class="step-desc">Seu banco de dados PostgreSQL gratuito na nuvem</div></div>
+          <span class="step-badge tag-blue">Grátis</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Acesse <strong>supabase.com</strong> e crie conta com GitHub</div>
+          <div class="detail-row">Clique em <strong>New Project</strong> → dê o nome "golden-pets" → escolha região <strong>South America (São Paulo)</strong></div>
+          <div class="detail-row">Anote as credenciais: <strong>Project URL</strong> e <strong>anon public key</strong> — você vai precisar no .env</div>
+          <div class="cmd"><span class="cm"># instalar no seu projeto Next.js</span><br><span class="kw">npm install</span> <span class="str">@supabase/supabase-js @supabase/ssr</span></div>
+          <div class="detail-row">Crie o arquivo <strong>.env.local</strong> na raiz do projeto com as variáveis do Supabase</div>
+          <div class="tip">O plano gratuito inclui 500MB de banco, 5GB de storage e 50.000 usuários autenticados — mais que suficiente para validar a loja.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">2</div>
+          <div class="step-info"><div class="step-name">Criar tabelas do banco de dados</div><div class="step-desc">Produtos, pedidos, clientes, categorias</div></div>
+          <span class="step-badge tag-orange">Crítico</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">No painel do Supabase vá em <strong>SQL Editor</strong> e execute as queries abaixo para criar as tabelas:</div>
+          <div class="cmd"><span class="cm">-- Tabela de produtos</span><br>
+<span class="kw">CREATE TABLE</span> products (<br>
+&nbsp;&nbsp;id <span class="str">uuid</span> DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+&nbsp;&nbsp;name <span class="str">text</span> NOT NULL,<br>
+&nbsp;&nbsp;slug <span class="str">text</span> UNIQUE NOT NULL,<br>
+&nbsp;&nbsp;description <span class="str">text</span>,<br>
+&nbsp;&nbsp;price <span class="str">numeric(10,2)</span> NOT NULL,<br>
+&nbsp;&nbsp;original_price <span class="str">numeric(10,2)</span>,<br>
+&nbsp;&nbsp;stock <span class="str">integer</span> DEFAULT 0,<br>
+&nbsp;&nbsp;category <span class="str">text</span>,<br>
+&nbsp;&nbsp;images <span class="str">text[]</span>,<br>
+&nbsp;&nbsp;active <span class="str">boolean</span> DEFAULT true,<br>
+&nbsp;&nbsp;created_at <span class="str">timestamptz</span> DEFAULT now()<br>
+);<br><br>
+<span class="cm">-- Tabela de pedidos</span><br>
+<span class="kw">CREATE TABLE</span> orders (<br>
+&nbsp;&nbsp;id <span class="str">uuid</span> DEFAULT gen_random_uuid() PRIMARY KEY,<br>
+&nbsp;&nbsp;customer_email <span class="str">text</span> NOT NULL,<br>
+&nbsp;&nbsp;customer_name <span class="str">text</span>,<br>
+&nbsp;&nbsp;items <span class="str">jsonb</span> NOT NULL,<br>
+&nbsp;&nbsp;total <span class="str">numeric(10,2)</span> NOT NULL,<br>
+&nbsp;&nbsp;status <span class="str">text</span> DEFAULT <span class="str">'pending'</span>,<br>
+&nbsp;&nbsp;payment_method <span class="str">text</span>,<br>
+&nbsp;&nbsp;payment_id <span class="str">text</span>,<br>
+&nbsp;&nbsp;address <span class="str">jsonb</span>,<br>
+&nbsp;&nbsp;created_at <span class="str">timestamptz</span> DEFAULT now()<br>
+);</div>
+          <div class="tip">Crie também tabelas: <strong>customers</strong> (dados do cliente), <strong>categories</strong> (categorias de produtos) e <strong>admin_users</strong> (apenas você terá acesso).</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">3</div>
+          <div class="step-info"><div class="step-name">Configurar autenticação de admin</div><div class="step-desc">Só você acessa o dashboard — nenhum cliente entra</div></div>
+          <span class="step-badge tag-blue">Rápido</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">No Supabase vá em <strong>Authentication → Users → Add user</strong> e crie seu usuário admin com email e senha forte</div>
+          <div class="detail-row">Crie o arquivo <strong>/app/admin/login/page.tsx</strong> com formulário de login usando <strong>supabase.auth.signInWithPassword()</strong></div>
+          <div class="detail-row">Crie um <strong>middleware.ts</strong> na raiz do projeto para proteger todas as rotas <strong>/admin/*</strong> — redireciona para login se não autenticado</div>
+          <div class="cmd"><span class="cm">// middleware.ts — protege rotas admin</span><br>
+<span class="kw">import</span> { createMiddlewareClient } from <span class="str">'@supabase/ssr'</span><br>
+<span class="kw">export const</span> config = {<br>
+&nbsp;&nbsp;matcher: [<span class="str">'/admin/:path*'</span>]<br>
+}</div>
+          <div class="tip">Isso garante que nenhum cliente acidentalmente acesse seu painel de gestão.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">4</div>
+          <div class="step-info"><div class="step-name">Conectar front-end ao banco</div><div class="step-desc">Substituir /data/products.ts pelo banco real</div></div>
+          <span class="step-badge tag-orange">Crítico</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Crie <strong>/lib/supabase.ts</strong> com o client configurado</div>
+          <div class="detail-row">Nas suas páginas de produto, substitua o import estático por uma query real:</div>
+          <div class="cmd"><span class="cm">// Em /app/produtos/page.tsx</span><br>
+<span class="kw">const</span> { data: products } = <span class="kw">await</span> supabase<br>
+&nbsp;&nbsp;.from(<span class="str">'products'</span>)<br>
+&nbsp;&nbsp;.select(<span class="str">'*'</span>)<br>
+&nbsp;&nbsp;.eq(<span class="str">'active'</span>, true)<br>
+&nbsp;&nbsp;.order(<span class="str">'created_at'</span>, { ascending: false })</div>
+          <div class="tip">Como é Next.js com Server Components, essa query roda no servidor — o banco nunca fica exposto ao cliente.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="phase-1" class="phase">
+    <div class="ph-header">
+      <div class="ph-num">2</div>
+      <div><div class="ph-title">Gateway de pagamento</div><div class="ph-sub">MercadoPago — melhor opção para Brasil iniciante · ~1 semana</div></div>
+    </div>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">1</div>
+          <div class="step-info"><div class="step-name">Por que MercadoPago para começar</div><div class="step-desc">Comparativo dos gateways para o mercado brasileiro</div></div>
+          <span class="step-badge tag-blue">Info</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row"><strong>MercadoPago</strong> — Taxa ~4,49% (cartão 14 dias). Pix + boleto + cartão. API fácil, amplamente conhecido pelo consumidor BR. Ideal para começar.</div>
+          <div class="detail-row"><strong>Pagar.me</strong> — Taxa 3,99% + R$0,99. Checkout mais bonito, API mais técnica. Melhor para volume médio (acima de 50 pedidos/mês).</div>
+          <div class="detail-row"><strong>Stripe</strong> — Taxa 3,99% + R$0,39. Excelente documentação, suporta Pix. Indicado se você quiser vender para fora do Brasil também.</div>
+          <div class="detail-row"><strong>PagBank</strong> — Similar ao MercadoPago, popular no Brasil, checkout reconhecido.</div>
+          <div class="tip"><strong>Recomendação:</strong> comece com MercadoPago por ser o mais fácil de integrar, mais reconhecido pelo consumidor brasileiro e sem mensalidade. Quando tiver volume, migre para Pagar.me para pagar menos taxa.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">2</div>
+          <div class="step-info"><div class="step-name">Criar conta e obter credenciais</div><div class="step-desc">MercadoPago Developer — acesso à API</div></div>
+          <span class="step-badge tag-blue">Grátis</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Acesse <strong>mercadopago.com.br</strong> e crie conta como pessoa física ou jurídica (PJ é obrigatório para sacar acima de R$20k/mês)</div>
+          <div class="detail-row">Vá em <strong>Seu negócio → Configurações → Credenciais</strong> para pegar o <strong>Access Token</strong> e <strong>Public Key</strong></div>
+          <div class="detail-row">Use as credenciais de <strong>teste</strong> primeiro — o MercadoPago tem ambiente sandbox completo</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">mercadopago</span></div>
+          <div class="detail-row">Adicione no <strong>.env.local</strong>: MP_ACCESS_TOKEN e NEXT_PUBLIC_MP_PUBLIC_KEY</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">3</div>
+          <div class="step-info"><div class="step-name">Criar a rota de API de checkout</div><div class="step-desc">/api/checkout — recebe pedido e cria preferência de pagamento</div></div>
+          <span class="step-badge tag-orange">Crítico</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Crie o arquivo <strong>/app/api/checkout/route.ts</strong></div>
+          <div class="cmd"><span class="cm">// Recebe os itens do carrinho e cria preferência no MP</span><br>
+<span class="kw">import</span> MercadoPagoConfig, { Preference } from <span class="str">'mercadopago'</span><br><br>
+<span class="kw">export async function</span> POST(req) {<br>
+&nbsp;&nbsp;<span class="kw">const</span> { items, customer } = <span class="kw">await</span> req.json()<br>
+&nbsp;&nbsp;<span class="kw">const</span> mp = <span class="kw">new</span> MercadoPagoConfig({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;accessToken: process.env.MP_ACCESS_TOKEN<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<span class="kw">const</span> pref = <span class="kw">await new</span> Preference(mp).create({<br>
+&nbsp;&nbsp;&nbsp;&nbsp;body: { items, payer: customer,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;back_urls: { success: <span class="str">'/pedido/sucesso'</span> } }<br>
+&nbsp;&nbsp;})<br>
+&nbsp;&nbsp;<span class="kw">return</span> Response.json({ id: pref.id })<br>
+}</div>
+          <div class="tip">O MercadoPago redireciona o cliente para a página deles para pagar e depois volta para sua URL de sucesso. Simples e seguro.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">4</div>
+          <div class="step-info"><div class="step-name">Webhook — confirmar pagamento e salvar pedido</div><div class="step-desc">MercadoPago avisa seu site quando o pagamento é aprovado</div></div>
+          <span class="step-badge tag-orange">Crítico</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Crie <strong>/app/api/webhook/route.ts</strong> — o MercadoPago vai chamar essa URL quando o pagamento for confirmado</div>
+          <div class="detail-row">Nessa rota: valide a assinatura do MP, busque os detalhes do pagamento pela API do MP, salve o pedido no Supabase com status "pago" e atualize o estoque</div>
+          <div class="detail-row">Configure a URL do webhook no painel do MercadoPago em <strong>Configurações → Notificações → Webhooks</strong></div>
+          <div class="warn"><strong>Atenção:</strong> sem o webhook, você nunca saberá se o pagamento foi aprovado. É o passo mais crítico de toda a integração de pagamentos.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">5</div>
+          <div class="step-info"><div class="step-name">Carrinho de compras no front-end</div><div class="step-desc">Estado global com Zustand — persiste entre páginas</div></div>
+          <span class="step-badge tag-outline">Front-end</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">zustand</span></div>
+          <div class="detail-row">Crie <strong>/store/cartStore.ts</strong> com Zustand para gerenciar os itens do carrinho</div>
+          <div class="detail-row">Estado do carrinho: lista de itens, total, adicionar, remover, limpar</div>
+          <div class="detail-row">Use <strong>localStorage persist</strong> do Zustand para o carrinho não sumir ao recarregar a página</div>
+          <div class="detail-row">Crie o componente <strong>CartDrawer.tsx</strong> — painel lateral que desliza com os itens e botão de finalizar compra</div>
+          <div class="tip">Zustand é simples de usar e se integra perfeitamente com Next.js. Muito mais fácil que Redux para este caso.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="phase-2" class="phase">
+    <div class="ph-header">
+      <div class="ph-num">3</div>
+      <div><div class="ph-title">Dashboard de administração</div><div class="ph-sub">Sua tela de gestão da loja — só você acessa · ~1-2 semanas</div></div>
+    </div>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">1</div>
+          <div class="step-info"><div class="step-name">Estrutura do painel /admin</div><div class="step-desc">Rota protegida com layout próprio</div></div>
+          <span class="step-badge tag-blue">Estrutura</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Crie o grupo de rotas <strong>/app/admin/</strong> com layout próprio (sidebar + header) separado do layout público da loja</div>
+          <div class="detail-row">Estrutura de páginas do admin:</div>
+          <div class="cmd">/app/admin/<br>
+&nbsp;&nbsp;layout.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← sidebar + proteção de rota</span><br>
+&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← dashboard com métricas</span><br>
+&nbsp;&nbsp;produtos/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← lista de produtos</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;novo/page.tsx <span class="cm">← formulário de novo produto</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[id]/page.tsx <span class="cm">← editar produto</span><br>
+&nbsp;&nbsp;pedidos/<br>
+&nbsp;&nbsp;&nbsp;&nbsp;page.tsx &nbsp;&nbsp;&nbsp;&nbsp;<span class="cm">← todos os pedidos</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;[id]/page.tsx <span class="cm">← detalhe do pedido</span><br>
+&nbsp;&nbsp;clientes/page.tsx <span class="cm">← lista de clientes</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">2</div>
+          <div class="step-info"><div class="step-name">Tela de dashboard — métricas em tempo real</div><div class="step-desc">Visão geral de vendas, pedidos e produtos</div></div>
+          <span class="step-badge tag-outline">Visual</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Cards de métricas no topo: <strong>Receita do mês</strong>, <strong>Pedidos hoje</strong>, <strong>Ticket médio</strong>, <strong>Produtos ativos</strong></div>
+          <div class="detail-row">Gráfico de vendas dos últimos 30 dias (usar <strong>Recharts</strong> — já vem com o shadcn/ui)</div>
+          <div class="detail-row">Tabela dos 5 últimos pedidos com status colorido (pendente/pago/enviado/entregue)</div>
+          <div class="detail-row">Alertas: produtos com estoque baixo (abaixo de 5 unidades)</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">recharts</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">3</div>
+          <div class="step-info"><div class="step-name">Gestão de produtos — CRUD completo</div><div class="step-desc">Criar, editar, ativar e deletar produtos</div></div>
+          <span class="step-badge tag-orange">Essencial</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Tabela paginada com todos os produtos: imagem, nome, preço, estoque, status ativo/inativo</div>
+          <div class="detail-row">Formulário de novo produto com os campos: nome, slug (auto-gerado), descrição, preço, preço original, estoque, categoria, imagens</div>
+          <div class="detail-row">Upload de imagens via <strong>Supabase Storage</strong> — drag-and-drop direto no formulário</div>
+          <div class="detail-row">Botão de ativar/desativar produto sem deletar (soft delete)</div>
+          <div class="tip">Use o componente <strong>shadcn/ui Form</strong> com <strong>react-hook-form</strong> e <strong>zod</strong> para validação — economiza muito tempo.</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">react-hook-form zod @hookform/resolvers</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">4</div>
+          <div class="step-info"><div class="step-name">Gestão de pedidos</div><div class="step-desc">Ver, filtrar e atualizar status de cada pedido</div></div>
+          <span class="step-badge tag-orange">Essencial</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Tabela de pedidos com filtro por status: <strong>Pendente / Pago / Enviado / Entregue / Cancelado</strong></div>
+          <div class="detail-row">Página individual do pedido: itens comprados, dados do cliente, endereço de entrega, método de pagamento, histórico de status</div>
+          <div class="detail-row">Botão para atualizar status manualmente (ex: marcar como enviado e adicionar código de rastreio)</div>
+          <div class="detail-row">Campo de código de rastreio — quando preenchido, o cliente recebe e-mail automático com o código</div>
+          <div class="tip">Para envio de e-mail, use <strong>Resend</strong> (gratuito até 3.000 e-mails/mês) + <strong>React Email</strong> para montar templates bonitos em JSX.</div>
+          <div class="cmd"><span class="kw">npm install</span> <span class="str">resend react-email</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="phase-3" class="phase">
+    <div class="ph-header">
+      <div class="ph-num">4</div>
+      <div><div class="ph-title">Deploy e domínio</div><div class="ph-sub">Colocar no ar de verdade · ~2 dias</div></div>
+    </div>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">1</div>
+          <div class="step-info"><div class="step-name">Deploy na Vercel</div><div class="step-desc">Gratuito, deploy automático a cada push</div></div>
+          <span class="step-badge tag-blue">Grátis</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Suba o código para o <strong>GitHub</strong> em um repositório privado</div>
+          <div class="detail-row">Acesse <strong>vercel.com</strong>, conecte com o GitHub e importe o repositório</div>
+          <div class="detail-row">Adicione todas as variáveis do <strong>.env.local</strong> no painel de Environment Variables da Vercel</div>
+          <div class="detail-row">A Vercel detecta Next.js automaticamente e configura o build sem precisar mexer em nada</div>
+          <div class="detail-row">Após o deploy, você terá uma URL como <strong>golden-pets.vercel.app</strong> para testar</div>
+          <div class="tip">A cada vez que você fizer push para a branch main, a Vercel faz deploy automático. Branches diferentes viram previews com URL própria.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">2</div>
+          <div class="step-info"><div class="step-name">Comprar domínio .com.br</div><div class="step-desc">goldenpets.com.br passa credibilidade</div></div>
+          <span class="step-badge tag-outline">~R$ 40/ano</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Registre em <strong>registro.br</strong> (oficial) ou <strong>Hostinger</strong> (mais barato com hospedagem)</div>
+          <div class="detail-row">Após comprar, no DNS do domínio adicione um registro <strong>CNAME</strong> apontando para <strong>cname.vercel-dns.com</strong></div>
+          <div class="detail-row">Na Vercel em <strong>Settings → Domains</strong> adicione o domínio personalizado</div>
+          <div class="detail-row">A Vercel gera o <strong>certificado SSL (HTTPS)</strong> automaticamente e de graça</div>
+          <div class="tip">Domínio .com.br transmite muito mais confiança para o consumidor brasileiro do que .vercel.app ou .com.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">3</div>
+          <div class="step-info"><div class="step-name">Configurar variáveis de ambiente de produção</div><div class="step-desc">Separar ambiente de teste do ambiente real</div></div>
+          <span class="step-badge tag-orange">Crítico</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">No MercadoPago: troque as credenciais de <strong>teste</strong> pelas de <strong>produção</strong> nas variáveis da Vercel</div>
+          <div class="detail-row">No Supabase: confirme que o projeto está com Row Level Security (RLS) ativado nas tabelas públicas</div>
+          <div class="detail-row">Configure as URLs de retorno do MercadoPago para o domínio real (não mais localhost)</div>
+          <div class="warn"><strong>Nunca</strong> coloque credenciais de produção no .env.local ou no GitHub. Use apenas nas variáveis de ambiente da Vercel.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="phase-4" class="phase">
+    <div class="ph-header">
+      <div class="ph-num">5</div>
+      <div><div class="ph-title">Pré-lançamento e primeiras vendas</div><div class="ph-sub">Checklist final antes de divulgar · ~3 dias</div></div>
+    </div>
+    <div class="step-list">
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">1</div>
+          <div class="step-info"><div class="step-name">Páginas legais obrigatórias</div><div class="step-desc">Sem isso você não pode vender legalmente</div></div>
+          <span class="step-badge tag-orange">Obrigatório</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row"><strong>Política de Privacidade</strong> — obrigatória pela LGPD. Descreve quais dados você coleta e como usa</div>
+          <div class="detail-row"><strong>Termos de Uso</strong> — regras de uso da loja, limitação de responsabilidade</div>
+          <div class="detail-row"><strong>Política de Trocas e Devoluções</strong> — o Código de Defesa do Consumidor garante 7 dias de arrependimento</div>
+          <div class="detail-row"><strong>Informações de entrega</strong> — prazo estimado, transportadoras utilizadas</div>
+          <div class="tip">Use o gerador gratuito de termos do <strong>Jusbrasil</strong> ou <strong>LegalFind</strong> como base — adapte com os dados da sua loja.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">2</div>
+          <div class="step-info"><div class="step-name">Testar o fluxo de compra completo</div><div class="step-desc">Do produto até o pedido salvo no banco</div></div>
+          <span class="step-badge tag-orange">Não pule</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Use os <strong>cartões de teste do MercadoPago</strong> para simular uma compra aprovada, recusada e pendente</div>
+          <div class="detail-row">Confirme que o pedido aparece no banco de dados após o pagamento aprovado</div>
+          <div class="detail-row">Confirme que o e-mail de confirmação chega na caixa do cliente</div>
+          <div class="detail-row">Confirme que o dashboard admin mostra o pedido e que você consegue atualizar o status</div>
+          <div class="detail-row">Teste no celular — a maioria das compras no Brasil é feita pelo mobile</div>
+          <div class="warn">Se o webhook não funcionar em produção, nenhum pedido será registrado. Teste isso antes de divulgar.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-head" onclick="tog(this)">
+          <div class="step-idx">3</div>
+          <div class="step-info"><div class="step-name">SEO básico e Google Analytics</div><div class="step-desc">Para aparecer no Google e saber de onde vêm as visitas</div></div>
+          <span class="step-badge tag-blue">Grátis</span>
+          <span class="arrow">▼</span>
+        </div>
+        <div class="step-body">
+          <div class="detail-row">Configure o <strong>generateMetadata</strong> do Next.js em cada página com title e description únicos</div>
+          <div class="detail-row">Crie o arquivo <strong>sitemap.ts</strong> em /app para gerar o sitemap automaticamente</div>
+          <div class="detail-row">Registre o site no <strong>Google Search Console</strong> e envie o sitemap</div>
+          <div class="detail-row">Instale o <strong>Google Analytics 4</strong> via script no layout.tsx ou via next/script</div>
+          <div class="tip">Com o Search Console você consegue ver em quais buscas do Google seu site aparece — fundamental para otimizar.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="phase-5" class="phase">
+    <div class="ph-header">
+      <div class="ph-num">R$</div>
+      <div><div class="ph-title">Custo total estimado</div><div class="ph-sub">Para começar do zero até a primeira venda</div></div>
+    </div>
+    <div class="cost-grid">
+      <div class="cost-card"><div class="cost-label">Supabase</div><div class="cost-val free">R$ 0</div><div class="cost-note">Gratuito até 500MB</div></div>
+      <div class="cost-card"><div class="cost-label">Vercel</div><div class="cost-val free">R$ 0</div><div class="cost-note">Hobby plan gratuito</div></div>
+      <div class="cost-card"><div class="cost-label">Domínio .com.br</div><div class="cost-val">~R$ 40</div><div class="cost-note">Por ano, no registro.br</div></div>
+      <div class="cost-card"><div class="cost-label">MercadoPago</div><div class="cost-val">~4,49%</div><div class="cost-note">Só paga quando vende</div></div>
+      <div class="cost-card"><div class="cost-label">Resend (email)</div><div class="cost-val free">R$ 0</div><div class="cost-note">Grátis até 3k emails/mês</div></div>
+      <div class="cost-card"><div class="cost-label">SSL (HTTPS)</div><div class="cost-val free">R$ 0</div><div class="cost-note">Vercel gera grátis</div></div>
+    </div>
+    
+    <div class="summary-box">
+      <div class="summary-box-title">Total para lançar: R$ 40/ano</div>
+      <div class="summary-box-text">Você consegue ter uma loja completa com banco de dados, painel admin, pagamentos e domínio próprio gastando apenas R$ 40 no primeiro ano. Tudo o mais só começa a custar quando você escalar.</div>
+    </div>
+    
+    <div class="future-box">
+      <div class="future-box-title">Quando começar a crescer — próximos custos</div>
+      <div class="future-box-text">
+        &bull; <strong>Supabase Pro:</strong> US$25/mês (quando passar de 500MB)<br>
+        &bull; <strong>Vercel Pro:</strong> US$20/mês (se precisar de mais builds ou domínios)<br>
+        &bull; <strong>Pagar.me (em vez do MP):</strong> taxa menor a partir de 50+ pedidos/mês<br>
+        &bull; <strong>Shopify Storefront API:</strong> quando quiser delegar o estoque para o Shopify
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function goPhase(n, btn){
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.pnav').forEach(b => b.classList.remove('active'));
+  document.getElementById('phase-' + n).classList.add('on');
+  btn.classList.add('active');
+  const pcts = [20, 40, 60, 80, 100, 100];
+  document.getElementById('prog').style.width = pcts[n] + '%';
+}
+
+function tog(head){
+  const body = head.nextElementSibling;
+  const wasOpen = body.classList.contains('open');
+  head.closest('.step').querySelectorAll('.step-body').forEach(b => b.classList.remove('open'));
+  head.closest('.step-list').querySelectorAll('.step-head').forEach(h => h.classList.remove('opened'));
+  if(!wasOpen){
+    body.classList.add('open');
+    head.classList.add('opened');
+  }
+}
+</script>
+</body>
+</html>

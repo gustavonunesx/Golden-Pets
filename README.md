@@ -84,7 +84,7 @@ pnpm dev
 npm run dev
 ```
 
-Acesse [http://localhost:3000](http://localhost:3000) no navegador. 🎉
+Acesse [http://localhost:3000](http://localhost:3000) no navegador.
 
 ---
 

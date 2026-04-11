@@ -62,6 +62,8 @@ No test suite is configured.
 - `/admin/produtos` — Product management (protected)
 - `/admin/pedidos` — Order management (protected)
 - `/admin/clientes` — Customer management (protected)
+- `/checkout` — Checkout form (client component, react-hook-form + Zod, auto-fills address via ViaCEP API)
+- `/pedido/sucesso` — Order confirmation page (receives `?order=<id>&status=pending` params)
 
 #### Admin Route Structure
 
@@ -83,6 +85,26 @@ app/admin/
 - `components/sections/CartDrawer.tsx` — Slide-out drawer (shadcn Sheet) with item list, quantity controls, total, and checkout button.
 - `components/ui/cart-button.tsx` — Navbar button with animated badge showing item count.
 - Cart is integrated in `Navbar` (desktop + mobile) and `ProductDetail` ("Adicionar ao carrinho" / "Comprar agora").
+
+### Checkout & Payments
+
+- `lib/validations/checkout.ts` — Zod schemas: `customerSchema`, `addressSchema`, `checkoutSchema`. Input: name, email, phone (digits only), CPF (11 digits), full address.
+- `lib/mercadopago.ts` — Lazy-initialized MercadoPago client. `getPreferenceClient()` creates Preference, `getPaymentClient()` fetches payment details for webhooks.
+- `app/checkout/page.tsx` — Client component form. Auto-fills address on CEP input via ViaCEP API. Submits to `/api/checkout`, redirects to `initPoint` URL on success.
+- `app/api/checkout/route.ts` — POST: validates with Zod, fetches prices from DB (never trusts frontend), creates customer/address/order/order_items in Supabase via service_role, creates MP Preference, returns `{ orderId, initPoint }`.
+- `app/api/webhook/mercadopago/route.ts` — POST: validates HMAC-SHA256 signature (`MP_WEBHOOK_SECRET`), fetches payment from MP API, maps status to internal status, updates `orders` table.
+- `app/pedido/sucesso/page.tsx` — Confirmation page, reads `?order` and `?status` params. Shows green checkmark for approved, orange clock for pending.
+
+#### Orders table — required columns
+
+The `orders` table must have these columns (add via Supabase SQL if missing):
+```sql
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS payment_id text,
+  ADD COLUMN IF NOT EXISTS payment_status text NOT NULL DEFAULT 'pending',
+  ADD COLUMN IF NOT EXISTS paid_at timestamptz;
+```
+The `status` column must also exist (type text, default `'pending'`).
 
 ### Product Data Layer
 
@@ -111,12 +133,14 @@ app/admin/
 - **next-themes** — Dark mode support (prepared but not actively used).
 - **@vercel/analytics** — Included in root layout.
 - **Zustand** — Cart state management with localStorage persistence.
-- **MercadoPago SDK** — Payment processing (planned).
+- **MercadoPago SDK** — Payment processing. `getPreferenceClient()` / `getPaymentClient()` in `lib/mercadopago.ts`.
 - **Resend** — Transactional emails (planned).
 
 ### Utilities
 
 - `lib/utils.ts` — `cn()` helper (clsx + tailwind-merge).
+- `lib/validations/checkout.ts` — Zod schemas for checkout form.
+- `lib/mercadopago.ts` — MercadoPago SDK wrapper.
 - `hooks/use-mobile.ts` — Detects mobile viewport at 768px breakpoint.
 
 ### Environment Variables
@@ -126,6 +150,7 @@ app/admin/
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 NEXT_PUBLIC_MP_PUBLIC_KEY=
+NEXT_PUBLIC_SITE_URL=        # ex: https://goldenpets.com.br (used in checkout back_urls)
 
 # Secret (server only — NEVER with NEXT_PUBLIC_)
 SUPABASE_SERVICE_ROLE_KEY=

@@ -69,15 +69,36 @@ No test suite is configured.
 
 ```
 app/admin/
-├── login/page.tsx          ← sem layout admin, acesso livre
-├── 403/page.tsx            ← sem layout admin, acesso livre
+├── login/page.tsx                         ← sem layout admin, acesso livre
+├── 403/page.tsx                           ← sem layout admin, acesso livre
 └── (protected)/
-    ├── layout.tsx          ← verifica x-admin-role header, renderiza sidebar
-    ├── page.tsx            ← dashboard
-    ├── produtos/page.tsx
+    ├── layout.tsx                         ← verifica x-admin-role header, renderiza sidebar
+    ├── page.tsx                           ← dashboard
+    ├── produtos/
+    │   ├── page.tsx                       ← lista produtos via createAdminClient()
+    │   ├── novo/page.tsx                  ← busca categorias, renderiza ProductForm mode="create"
+    │   └── [id]/page.tsx                  ← busca produto+imagens+categorias, renderiza ImageUploader + ProductForm mode="edit"
     ├── pedidos/page.tsx
     └── clientes/page.tsx
 ```
+
+#### Admin API Routes
+
+```
+app/api/admin/
+├── categories/route.ts                    ← GET lista, POST criar (auto-slug do nome)
+└── products/
+    ├── route.ts                           ← GET lista, POST criar (valida slug único)
+    └── [id]/
+        ├── route.ts                       ← GET um, PUT editar, DELETE (soft: active=false)
+        ├── toggle-active/route.ts         ← PATCH alterna active true/false
+        └── images/
+            ├── route.ts                   ← POST upload (FormData → Storage → product_images)
+            ├── [imageId]/route.ts         ← DELETE imagem (remove Storage + DB)
+            └── reorder/route.ts           ← PUT reordenar (array de IDs → UPDATE individual por posição)
+```
+
+Todas as routes de admin chamam `requireAdminSession()` (de `lib/admin-auth.ts`) no início — retorna 401 se sem sessão, 403 se não for admin.
 
 ### Cart System
 
@@ -108,20 +129,27 @@ The `status` column must also exist (type text, default `'pending'`).
 
 ### Product Data Layer
 
-- `lib/queries/products.ts` — Server-side query functions: `getProducts()`, `getProductBySlug()`, `getProductsByCategory()`, `getFeaturedProducts()`. Each falls back to hardcoded `data/products.ts` if Supabase is unreachable or returns empty.
+- `lib/queries/products.ts` — Server-side query functions: `getProducts()`, `getProductBySlug()`, `getProductsByCategory()`, `getFeaturedProducts()`. Each falls back to hardcoded `data/products.ts` if Supabase is unreachable or returns empty. **Importante:** imagens são buscadas em query separada via `attachImages()` (não como join aninhado) para evitar referência circular no RLS de `product_images`.
 - `data/products.ts` — 10 hardcoded products kept as fallback. Being migrated to Supabase.
+- `app/produto/[slug]/page.tsx` — tem `export const revalidate = 60` (ISR de 60s).
 
 ### Component Structure
 
-- `components/sections/` — Large page-section components (Navbar, Hero, FeaturedProducts, ProductDetail, AuthModal, CartDrawer, Footer, etc.). Most are `'use client'` for interactivity.
-- `components/admin/` — Admin panel components (AdminSidebar).
-- `components/ui/` — shadcn/ui components plus custom ones (`product-card.tsx`, `product-image.tsx`, `custom-badge.tsx`, `custom-button.tsx`, `cart-button.tsx`).
+- `components/sections/` — Large page-section components (Navbar, Hero, FeaturedProducts, ProductDetail, AuthModal, CartDrawer, Footer, etc.). Most are `'use client'` for interactivity. `ProductDetail` exibe galeria de imagens com troca de imagem principal quando `product.images` existir.
+- `components/admin/` — Admin panel components:
+  - `AdminSidebar.tsx` — navegação + logout
+  - `produtos/ProductForm.tsx` — form completo (react-hook-form + zodResolver); suporta mode="create" e mode="edit"; criação de categoria inline
+  - `produtos/ImageUploader.tsx` — upload (POST FormData), drag-to-reorder (PUT reorder), delete por imagem; badge "CAPA" na primeira imagem
+  - `produtos/ProductsTable.tsx` — tabela com ações (editar, toggle active, deletar)
+  - `produtos/ToggleActiveButton.tsx` — botão PATCH com UI otimista
+  - `produtos/DeleteProductDialog.tsx` — modal de confirmação de soft-delete
+- `components/ui/` — shadcn/ui components plus custom ones (`product-card.tsx`, `product-image.tsx`, `custom-badge.tsx`, `custom-button.tsx`, `cart-button.tsx`). `product-image.tsx` aceita prop `src?`: quando presente renderiza `<img>`, senão exibe SVG paw print colorido.
 
 ### Data & Types
 
 - `data/products.ts` — 10 hardcoded products (fallback when Supabase is not configured).
 - `data/testimonials.ts` — 8 hardcoded testimonials.
-- `types/index.ts` — TypeScript interfaces: `Product`, `Testimonial`, `Category`.
+- `types/index.ts` — TypeScript interfaces: `Product`, `ProductImage`, `Testimonial`, `Category`. `Product` tem campo `images?: ProductImage[]`. `ProductImage` tem `id, product_id, url, position, alt_text?, created_at?` — nota: `created_at` é opcional pois a tabela pode não ter essa coluna.
 
 ### Key Libraries
 
@@ -139,7 +167,9 @@ The `status` column must also exist (type text, default `'pending'`).
 ### Utilities
 
 - `lib/utils.ts` — `cn()` helper (clsx + tailwind-merge).
+- `lib/admin-auth.ts` — `requireAdminSession()`: valida sessão Supabase + membership em `admin_users`; lança `AdminAuthError('UNAUTHENTICATED' | 'FORBIDDEN')` usado em todas as API routes de admin.
 - `lib/validations/checkout.ts` — Zod schemas for checkout form.
+- `lib/validations/product.ts` — Zod schema do produto (`productSchema`), compartilhado entre API e ProductForm.
 - `lib/mercadopago.ts` — MercadoPago SDK wrapper.
 - `hooks/use-mobile.ts` — Detects mobile viewport at 768px breakpoint.
 
@@ -169,4 +199,24 @@ RESEND_API_KEY=
 
 ### Build Notes
 
-`next.config.mjs` has `ignoreBuildErrors: true` for TypeScript and `unoptimized: true` for images — this is intentional; product images use colored SVG placeholders instead of real image files.
+`next.config.mjs` has `ignoreBuildErrors: true` for TypeScript and `unoptimized: true` for images — this is intentional. Product images são servidas do Supabase Storage (URLs públicas) e exibidas via `<img>` nativo; o SVG colorido é apenas fallback quando não há imagem cadastrada.
+
+### Product Image Upload Flow
+
+```
+Admin seleciona arquivo (max 5MB, JPEG/PNG/WebP/GIF)
+  → POST /api/admin/products/[id]/images  (FormData)
+      1. requireAdminSession()
+      2. Valida MIME + tamanho server-side
+      3. createAdminClient() (service_role)
+      4. Storage.upload → bucket "product-images" (público)
+         path: {productId}/{timestamp}-{random}.{ext}
+      5. URL pública: {SUPABASE_URL}/storage/v1/object/public/product-images/{path}
+      6. INSERT product_images (product_id, url, position = MAX+1)
+      7. Retorna { image: { id, url, position } }
+  → ImageUploader appenda imagem no estado local
+```
+
+**Soft delete de produto**: `active=false` (preserva histórico de pedidos). Imagens do produto permanecem no Storage.
+
+**Reordenar imagens**: UPDATE individual por imagem via `Promise.all` — NÃO usar upsert (exigiria todos os campos NOT NULL incluindo `url`).

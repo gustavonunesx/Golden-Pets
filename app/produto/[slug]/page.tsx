@@ -1,4 +1,6 @@
 import { Metadata } from 'next'
+
+export const revalidate = 60
 import { notFound } from 'next/navigation'
 import { getProducts, getProductBySlug, getProductsByCategory } from '@/lib/queries/products'
 import { Navbar } from '@/components/sections/Navbar'

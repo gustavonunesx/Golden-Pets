@@ -31,7 +31,7 @@ export function ProductCard({ product }: ProductCardProps) {
     >
       <Link href={`/produto/${product.slug}`} className="flex flex-col h-full">
         <div className="relative overflow-hidden">
-          <ProductImage color={product.imageColor} name={product.name} />
+          <ProductImage color={product.imageColor} name={product.name} src={product.images?.[0]?.url} />
           
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-wrap gap-1 sm:gap-2">
             <CustomBadge variant="orange" className="text-[10px] sm:text-xs px-1.5 py-0.5 sm:px-2 sm:py-1">{product.category}</CustomBadge>

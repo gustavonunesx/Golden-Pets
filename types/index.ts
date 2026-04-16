@@ -1,3 +1,12 @@
+export interface ProductImage {
+  id: string
+  product_id: string
+  url: string
+  position: number
+  alt_text?: string
+  created_at: string
+}
+
 export interface Product {
   id: string
   slug: string
@@ -14,6 +23,7 @@ export interface Product {
   badge?: 'mais-vendido' | 'novo' | 'oferta'
   inStock: boolean
   imageColor: string
+  images?: ProductImage[]
 }
 
 export interface Testimonial {

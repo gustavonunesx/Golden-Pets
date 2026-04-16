@@ -87,6 +87,9 @@ export function ProductDetail({ product }: ProductDetailProps) {
     } catch {}
   }, [product.slug])
 
+  const productImages = product.images ?? []
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+
   const hasDiscount = product.originalPrice && product.originalPrice > product.price
   const discountPercent = hasDiscount
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
@@ -195,14 +198,47 @@ export function ProductDetail({ product }: ProductDetailProps) {
           {/* Left Column - Image */}
           <motion.div variants={scaleIn} initial="hidden" animate="visible">
             <div className="sticky top-28">
-              <ProductImage
-                color={product.imageColor}
-                name={product.name}
-                className="w-full max-w-lg mx-auto"
-              />
-              {hasDiscount && (
-                <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                  -{discountPercent}%
+              {/* Imagem principal */}
+              <div className="relative">
+                <ProductImage
+                  color={product.imageColor}
+                  name={product.name}
+                  className="w-full max-w-lg mx-auto"
+                  src={productImages[selectedImageIndex]?.url}
+                />
+                {hasDiscount && (
+                  <div className="absolute top-4 right-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full">
+                    -{discountPercent}%
+                  </div>
+                )}
+              </div>
+
+              {/* Thumbnails do carrossel */}
+              {productImages.length > 1 && (
+                <div className="flex gap-2 mt-4 justify-center flex-wrap">
+                  {productImages.map((img, i) => (
+                    <button
+                      key={img.id}
+                      onClick={() => setSelectedImageIndex(i)}
+                      className="rounded-lg overflow-hidden border-2 transition-all"
+                      style={{
+                        width: '64px',
+                        height: '64px',
+                        borderColor: selectedImageIndex === i ? '#f97316' : '#e5e7eb',
+                        padding: 0,
+                        background: 'none',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                      }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.url}
+                        alt={`Foto ${i + 1} de ${product.name}`}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>

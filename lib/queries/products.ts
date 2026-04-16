@@ -67,7 +67,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return hardcodedProducts.find((p) => p.slug === slug) ?? null
   }
 
-  return mapDbProduct({ ...data, category_name: data.categories?.name })
+  const { data: imageRows } = await supabase
+    .from('product_images')
+    .select('id, product_id, url, position, alt_text, created_at')
+    .eq('product_id', data.id)
+    .order('position', { ascending: true })
+
+  return {
+    ...mapDbProduct({ ...data, category_name: data.categories?.name }),
+    images: imageRows ?? [],
+  }
 }
 
 export async function getProductsByCategory(

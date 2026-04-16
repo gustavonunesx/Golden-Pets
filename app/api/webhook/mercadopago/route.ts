@@ -7,7 +7,8 @@ import { getPaymentClient } from '@/lib/mercadopago'
 // Docs: https://www.mercadopago.com.br/developers/pt/docs/notifications/webhooks
 function verifySignature(request: NextRequest, rawBody: string): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET
-  if (!secret) return false // sem secret configurado, rejeita tudo
+  // Em desenvolvimento sem secret configurado, aceita tudo (apenas para testes locais)
+  if (!secret) return process.env.NODE_ENV !== 'production'
 
   const xSignature = request.headers.get('x-signature')
   const xRequestId = request.headers.get('x-request-id')

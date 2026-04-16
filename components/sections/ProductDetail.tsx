@@ -352,6 +352,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     name: product.name,
                     price: product.price,
                     imageColor: product.imageColor,
+                    imageUrl: product.images?.[0]?.url,
                   }, quantity)
                   setQuantity(1)
                 }}
@@ -369,6 +370,7 @@ export function ProductDetail({ product }: ProductDetailProps) {
                     name: product.name,
                     price: product.price,
                     imageColor: product.imageColor,
+                    imageUrl: product.images?.[0]?.url,
                   }, quantity)
                   router.push('/checkout')
                 }}

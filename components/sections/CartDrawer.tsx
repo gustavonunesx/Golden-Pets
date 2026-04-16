@@ -60,15 +60,23 @@ export function CartDrawer({ open, onOpenChange }: CartDrawerProps) {
                   key={item.productId}
                   className="flex gap-3 p-3 bg-gray-50 rounded-xl"
                 >
-                  {/* Color placeholder */}
-                  <div
-                    className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center"
-                    style={{ backgroundColor: item.imageColor }}
-                  >
-                    <span className="text-white text-xs font-bold text-center leading-tight px-1">
-                      {item.name.split(' ').slice(0, 2).join(' ')}
-                    </span>
-                  </div>
+                  {/* Imagem do produto */}
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="w-16 h-16 rounded-lg shrink-0 object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center"
+                      style={{ backgroundColor: item.imageColor }}
+                    >
+                      <span className="text-white text-xs font-bold text-center leading-tight px-1">
+                        {item.name.split(' ').slice(0, 2).join(' ')}
+                      </span>
+                    </div>
+                  )}
 
                   <div className="flex-1 min-w-0">
                     <Link

@@ -102,10 +102,10 @@ Todas as routes de admin chamam `requireAdminSession()` (de `lib/admin-auth.ts`)
 
 ### Cart System
 
-- `stores/cart-store.ts` — Zustand store with `persist` middleware (localStorage key: `golden-pets-cart`). Use `skipHydration: true` + `useCartStore.persist.rehydrate()` in `useEffect` to avoid SSR mismatch.
-- `components/sections/CartDrawer.tsx` — Slide-out drawer (shadcn Sheet) with item list, quantity controls, total, and checkout button.
+- `stores/cart-store.ts` — Zustand store with `persist` middleware (localStorage key: `golden-pets-cart`). Use `skipHydration: true` + `useCartStore.persist.rehydrate()` in `useEffect` to avoid SSR mismatch. `CartItem` has `imageUrl?: string` — shows product photo in drawer/checkout when available, falls back to `imageColor`.
+- `components/sections/CartDrawer.tsx` — Slide-out drawer (shadcn Sheet) with item list (shows `<img>` if `imageUrl` present, else color placeholder), quantity controls, total, and checkout button.
 - `components/ui/cart-button.tsx` — Navbar button with animated badge showing item count.
-- Cart is integrated in `Navbar` (desktop + mobile) and `ProductDetail` ("Adicionar ao carrinho" / "Comprar agora").
+- Cart is integrated in `Navbar` (desktop + mobile) and `ProductDetail` ("Adicionar ao carrinho" / "Comprar agora"). `ProductDetail` passes `imageUrl: product.images?.[0]?.url` on `addItem`.
 
 ### Checkout & Payments
 
@@ -116,16 +116,31 @@ Todas as routes de admin chamam `requireAdminSession()` (de `lib/admin-auth.ts`)
 - `app/api/webhook/mercadopago/route.ts` — POST: validates HMAC-SHA256 signature (`MP_WEBHOOK_SECRET`), fetches payment from MP API, maps status to internal status, updates `orders` table.
 - `app/pedido/sucesso/page.tsx` — Confirmation page, reads `?order` and `?status` params. Shows green checkmark for approved, orange clock for pending.
 
-#### Orders table — required columns
+#### Database column mapping (real column names differ from intuitive names)
 
-The `orders` table must have these columns (add via Supabase SQL if missing):
+| Code field | DB column | Table |
+|---|---|---|
+| `customerInput.name` | `full_name` | customers |
+| `addressInput.zip_code` | `cep` | addresses |
+| `totalAmount` | `total` | orders |
+| `i.total_price` | `subtotal` | order_items |
+
+#### Schema requirements
+
 ```sql
+-- customers: remove FK to auth.users (guest checkout) + add UUID default
+ALTER TABLE customers DROP CONSTRAINT customers_id_fkey;
+ALTER TABLE customers ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
+-- orders: add payment columns if missing
 ALTER TABLE orders
   ADD COLUMN IF NOT EXISTS payment_id text,
   ADD COLUMN IF NOT EXISTS payment_status text NOT NULL DEFAULT 'pending',
   ADD COLUMN IF NOT EXISTS paid_at timestamptz;
 ```
-The `status` column must also exist (type text, default `'pending'`).
+
+#### Localhost behavior
+`auto_return: 'approved'` is disabled on localhost (MP rejects it without HTTPS). After paying in test mode, user must click "Voltar ao site" manually. In production with HTTPS it redirects automatically.
 
 ### Product Data Layer
 

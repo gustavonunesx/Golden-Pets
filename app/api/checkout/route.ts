@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     await supabase
       .from('customers')
       .update({
-        name: customerInput.name,
+        full_name: customerInput.name,
         phone: customerInput.phone,
         cpf: customerInput.cpf,
       })
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     const { data: newCustomer, error: customerError } = await supabase
       .from('customers')
       .insert({
-        name: customerInput.name,
+        full_name: customerInput.name,
         email: customerInput.email,
         phone: customerInput.phone,
         cpf: customerInput.cpf,
@@ -95,11 +95,13 @@ export async function POST(request: NextRequest) {
   }
 
   // ── 6. Cria endereço ──────────────────────────────────────────────────────
+  const { zip_code, ...restAddress } = addressInput
   const { data: address, error: addressError } = await supabase
     .from('addresses')
     .insert({
       customer_id: customerId,
-      ...addressInput,
+      cep: zip_code,
+      ...restAddress,
     })
     .select('id')
     .single()
@@ -115,7 +117,7 @@ export async function POST(request: NextRequest) {
     .insert({
       customer_id: customerId,
       address_id: address.id,
-      total_amount: totalAmount,
+      total: totalAmount,
       status: 'pending',
       payment_status: 'pending',
     })
@@ -134,7 +136,7 @@ export async function POST(request: NextRequest) {
       product_id: i.product_id,
       quantity: i.quantity,
       unit_price: i.unit_price,
-      total_price: i.total_price,
+      subtotal: i.total_price,
     }))
   )
 
@@ -145,6 +147,7 @@ export async function POST(request: NextRequest) {
 
   // ── 9. Cria Preference no MercadoPago ────────────────────────────────────
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const isLocalhost = baseUrl.includes('localhost')
 
   try {
     const preference = await getPreferenceClient().create({
@@ -166,7 +169,8 @@ export async function POST(request: NextRequest) {
           failure: `${baseUrl}/checkout?error=pagamento`,
           pending: `${baseUrl}/pedido/sucesso?order=${order.id}&status=pending`,
         },
-        auto_return: 'approved',
+        // auto_return só funciona com HTTPS — desabilitado em localhost
+        ...(!isLocalhost && { auto_return: 'approved' as const }),
         notification_url: `${baseUrl}/api/webhook/mercadopago`,
       },
     })

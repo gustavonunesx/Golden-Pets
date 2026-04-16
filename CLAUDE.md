@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Instruções para o Claude
 
-**IMPORTANTE:** Sempre que fizer qualquer alteração no projeto — criar arquivos, mover rotas, instalar dependências, refatorar componentes, alterar arquitetura — atualize este CLAUDE.md na mesma sessão, antes de terminar a resposta. Não espere o usuário pedir. As seções a verificar/atualizar são: Routing & Pages, Component Structure, Key Libraries, Utilities, Build Notes e qualquer seção afetada pela mudança.
+**IMPORTANTE:** Quando o que o usuário requisitou estiver funcionando corretamente e sem erros, **sempre pergunte** se ele quer atualizar o CLAUDE.md antes de encerrar. Não atualize o arquivo durante o desenvolvimento (enquanto há erros ou ajustes em andamento) — espere tudo estar funcionando e então pergunte. As seções a verificar/atualizar são: Routing & Pages, Component Structure, Key Libraries, Utilities, Build Notes e qualquer seção afetada pela mudança.
 
 ## Commands
 

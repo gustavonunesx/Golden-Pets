@@ -1,4 +1,4 @@
-import { Product } from '@/types'
+import { Product, ProductImage } from '@/types'
 import { products as hardcodedProducts } from '@/data/products'
 
 async function getSupabaseClient() {
@@ -30,7 +30,47 @@ function mapDbProduct(row: Record<string, unknown>): Product {
     badge: row.badge as Product['badge'] ?? undefined,
     inStock: row.in_stock !== false,
     imageColor: row.image_color as string ?? '#f97316',
+    images: [],
   }
+}
+
+// Busca imagens de uma lista de product IDs em uma única query
+async function attachImages(
+  supabase: Awaited<ReturnType<typeof getSupabaseClient>>,
+  products: Product[]
+): Promise<Product[]> {
+  if (!supabase || products.length === 0) return products
+
+  const ids = products.map((p) => p.id)
+  const { data: imageRows, error: imgError } = await supabase
+    .from('product_images')
+    .select('id, product_id, url, position, alt_text')
+    .in('product_id', ids)
+    .order('position', { ascending: true })
+
+  if (imgError) {
+    console.error('[attachImages] Erro ao buscar imagens:', imgError.message, imgError.code)
+  }
+
+  if (!imageRows || imageRows.length === 0) return products
+
+  const imagesByProduct = new Map<string, ProductImage[]>()
+  for (const img of imageRows) {
+    const list = imagesByProduct.get(img.product_id) ?? []
+    list.push({
+      id: img.id,
+      product_id: img.product_id,
+      url: img.url,
+      position: img.position,
+      alt_text: img.alt_text ?? undefined,
+    })
+    imagesByProduct.set(img.product_id, list)
+  }
+
+  return products.map((p) => ({
+    ...p,
+    images: imagesByProduct.get(p.id) ?? [],
+  }))
 }
 
 export async function getProducts(): Promise<Product[]> {
@@ -45,10 +85,12 @@ export async function getProducts(): Promise<Product[]> {
 
   if (error || !data || data.length === 0) return hardcodedProducts
 
-  return data.map((row) => mapDbProduct({
+  const products = data.map((row) => mapDbProduct({
     ...row,
     category_name: row.categories?.name,
   }))
+
+  return attachImages(supabase, products)
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
@@ -67,16 +109,9 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return hardcodedProducts.find((p) => p.slug === slug) ?? null
   }
 
-  const { data: imageRows } = await supabase
-    .from('product_images')
-    .select('id, product_id, url, position, alt_text, created_at')
-    .eq('product_id', data.id)
-    .order('position', { ascending: true })
-
-  return {
-    ...mapDbProduct({ ...data, category_name: data.categories?.name }),
-    images: imageRows ?? [],
-  }
+  const product = mapDbProduct({ ...data, category_name: data.categories?.name })
+  const [withImages] = await attachImages(supabase, [product])
+  return withImages
 }
 
 export async function getProductsByCategory(
@@ -110,18 +145,18 @@ export async function getProductsByCategory(
       .slice(0, limit)
   }
 
-  return data.map((row) => mapDbProduct({
+  const products = data.map((row) => mapDbProduct({
     ...row,
     category_name: row.categories?.name,
   }))
+
+  return attachImages(supabase, products)
 }
 
 export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
   const supabase = await getSupabaseClient()
   if (!supabase) {
-    return hardcodedProducts
-      .filter((p) => p.badge)
-      .slice(0, limit)
+    return hardcodedProducts.filter((p) => p.badge).slice(0, limit)
   }
 
   const { data, error } = await supabase
@@ -135,8 +170,10 @@ export async function getFeaturedProducts(limit = 4): Promise<Product[]> {
     return hardcodedProducts.filter((p) => p.badge).slice(0, limit)
   }
 
-  return data.map((row) => mapDbProduct({
+  const products = data.map((row) => mapDbProduct({
     ...row,
     category_name: row.categories?.name,
   }))
+
+  return attachImages(supabase, products)
 }

@@ -36,20 +36,21 @@ export async function PUT(
 
   const supabase = createAdminClient()
 
-  // Atualiza todas as posições em uma única chamada upsert
-  const updates = parsed.data.order.map((imageId, index) => ({
-    id: imageId,
-    product_id: productId,
-    position: index,
-  }))
+  // UPDATE individual por imagem — evita upsert que exigiria todos os campos NOT NULL
+  const results = await Promise.all(
+    parsed.data.order.map((imageId, index) =>
+      supabase
+        .from('product_images')
+        .update({ position: index })
+        .eq('id', imageId)
+        .eq('product_id', productId) // garante que a imagem pertence ao produto
+    )
+  )
 
-  const { error } = await supabase
-    .from('product_images')
-    .upsert(updates, { onConflict: 'id' })
-
-  if (error) {
-    console.error('Erro ao reordenar imagens:', error)
-    return NextResponse.json({ error: 'Erro ao reordenar imagens' }, { status: 500 })
+  const failed = results.find(r => r.error)
+  if (failed?.error) {
+    console.error('Erro ao reordenar imagens:', failed.error)
+    return NextResponse.json({ error: failed.error.message }, { status: 500 })
   }
 
   return NextResponse.json({ ok: true })

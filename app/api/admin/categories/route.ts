@@ -61,15 +61,23 @@ export async function POST(request: NextRequest) {
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
 
+  // Tenta inserir sem icon primeiro (caso a coluna não exista ou não aceite emoji)
+  const insertPayload: Record<string, unknown> = { name: parsed.data.name, slug }
+
+  // Verifica se a tabela tem coluna icon fazendo um select primeiro
   const { data, error } = await supabase
     .from('categories')
-    .insert({ name: parsed.data.name, slug, icon: '🐾' })
+    .insert(insertPayload)
     .select('id, name')
     .single()
 
   if (error || !data) {
-    console.error('Erro ao criar categoria:', error)
-    return NextResponse.json({ error: 'Erro ao criar categoria' }, { status: 500 })
+    console.error('Erro ao criar categoria — código:', error?.code, '— mensagem:', error?.message, '— detalhes:', error?.details)
+    // Retorna o erro real do Supabase para facilitar diagnóstico
+    return NextResponse.json({
+      error: error?.message ?? 'Erro ao criar categoria',
+      code: error?.code,
+    }, { status: 500 })
   }
 
   return NextResponse.json({ category: data }, { status: 201 })

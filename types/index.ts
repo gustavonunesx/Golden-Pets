@@ -4,7 +4,7 @@ export interface ProductImage {
   url: string
   position: number
   alt_text?: string
-  created_at: string
+  created_at?: string
 }
 
 export interface Product {

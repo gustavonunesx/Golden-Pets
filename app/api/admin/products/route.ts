@@ -82,8 +82,13 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error || !data) {
-    console.error('Erro ao criar produto:', error)
-    return NextResponse.json({ error: 'Erro ao criar produto' }, { status: 500 })
+    console.error('Erro ao criar produto — código:', error?.code, '— mensagem:', error?.message, '— detalhes:', error?.details, '— hint:', error?.hint)
+    return NextResponse.json({
+      error: error?.message ?? 'Erro ao criar produto',
+      code: error?.code,
+      details: error?.details,
+      hint: error?.hint,
+    }, { status: 500 })
   }
 
   return NextResponse.json({ product: data }, { status: 201 })

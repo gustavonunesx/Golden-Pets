@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useCartStore, selectTotalPrice, selectTotalItems, CartItem } from '@/stores/cart-store'
 import { checkoutSchema, type CheckoutInput } from '@/lib/validations/checkout'
+import { createClient } from '@/lib/supabase/client'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatPrice(value: number) {
@@ -71,6 +72,53 @@ export default function CheckoutPage() {
   } = useForm<CheckoutInput>({
     resolver: zodResolver(checkoutSchema),
   })
+
+  // Pré-preenche dados se o cliente estiver logado
+  useEffect(() => {
+    async function loadUserData() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Busca dados do customer
+      const { data: customer } = await supabase
+        .from('customers')
+        .select('full_name, email, phone, cpf')
+        .eq('id', user.id)
+        .maybeSingle()
+
+      if (customer) {
+        if (customer.full_name) setValue('customer.name', customer.full_name)
+        if (customer.email) setValue('customer.email', customer.email)
+        if (customer.phone) setValue('customer.phone', customer.phone)
+        if (customer.cpf) setValue('customer.cpf', customer.cpf)
+      } else {
+        // Sem registro em customers, mas temos dados do auth
+        if (user.user_metadata?.full_name) setValue('customer.name', user.user_metadata.full_name)
+        if (user.email) setValue('customer.email', user.email)
+      }
+
+      // Busca último endereço salvo
+      const { data: address } = await supabase
+        .from('addresses')
+        .select('cep, street, number, complement, neighborhood, city, state')
+        .eq('customer_id', user.id)
+        .order('is_default', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (address) {
+        if (address.cep) setValue('address.zip_code', address.cep)
+        if (address.street) setValue('address.street', address.street)
+        if (address.number) setValue('address.number', address.number)
+        if (address.complement) setValue('address.complement', address.complement)
+        if (address.neighborhood) setValue('address.neighborhood', address.neighborhood)
+        if (address.city) setValue('address.city', address.city)
+        if (address.state) setValue('address.state', address.state)
+      }
+    }
+    loadUserData()
+  }, [setValue])
 
   // Auto-busca CEP
   const zipCode = watch('address.zip_code')

@@ -44,6 +44,13 @@ No test suite is configured.
 - **AdminSidebar** (`components/admin/AdminSidebar.tsx`): Navigation (Dashboard, Produtos, Pedidos, Clientes) + logout.
 - **403 Page** (`app/admin/403/page.tsx`): Shown when authenticated but not admin.
 
+### Customer Authentication
+
+- **AuthModal** (`components/sections/AuthModal.tsx`): Login/register modal with animated tabs. Login calls `signInWithPassword()`, register calls `signUp()` with `full_name` in `user_metadata` and creates a `customers` record linked by `auth.users.id`. On success, closes modal and reloads page.
+- **Navbar** detects auth state via `supabase.auth.getUser()` + `onAuthStateChange()`. Logged in: shows user name, dropdown menu (Minha conta, Meus pedidos, Sair). Logged out: shows "Entrar" / "Criar conta" buttons.
+- **Account pages** (`/minha-conta`, `/minha-conta/pedidos`): Client components that load customer data, addresses, and orders from Supabase. Redirect to `/` if not authenticated.
+- **Checkout pre-fill**: When logged in, checkout form auto-fills customer name/email/phone/CPF from `customers` table and last address from `addresses` table.
+
 ### Supabase Client Utilities
 
 - `lib/supabase/server.ts` — Server Components and Route Handlers (uses `cookies()` from next/headers)
@@ -62,8 +69,10 @@ No test suite is configured.
 - `/admin/produtos` — Product management (protected)
 - `/admin/pedidos` — Order management (protected)
 - `/admin/clientes` — Customer management (protected)
-- `/checkout` — Checkout form (client component, react-hook-form + Zod, auto-fills address via ViaCEP API)
+- `/checkout` — Checkout form (client component, react-hook-form + Zod, auto-fills address via ViaCEP API). Pre-fills customer data and last address when logged in.
 - `/pedido/sucesso` — Order confirmation page (receives `?order=<id>&status=pending` params)
+- `/minha-conta` — Customer account page (profile data, addresses, recent orders). Redirects to `/` if not logged in.
+- `/minha-conta/pedidos` — Full order history with item details per order.
 
 #### Admin Route Structure
 

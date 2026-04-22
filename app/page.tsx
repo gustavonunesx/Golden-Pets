@@ -17,9 +17,9 @@ export default async function Home() {
       <Navbar />
       <Hero />
       <TrustBar />
-      <Features />
       <FeaturedProducts products={featuredProducts} />
       <PromoBanner />
+      <Features />
       <Testimonials />
       <CtaBanner />
       <Footer />

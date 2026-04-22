@@ -82,20 +82,12 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <svg viewBox="0 0 40 40" className="w-8 h-8 md:w-10 md:h-10" aria-hidden="true">
-                <g fill="#f97316">
-                  <ellipse cx="20" cy="26" rx="10" ry="8" />
-                  <ellipse cx="8" cy="14" rx="4" ry="5" transform="rotate(-20, 8, 14)" />
-                  <ellipse cx="32" cy="14" rx="4" ry="5" transform="rotate(20, 32, 14)" />
-                  <ellipse cx="10" cy="21" rx="3.5" ry="4.5" transform="rotate(-10, 10, 21)" />
-                  <ellipse cx="30" cy="21" rx="3.5" ry="4.5" transform="rotate(10, 30, 21)" />
-                </g>
-              </svg>
-              <span className="text-xl md:text-2xl font-black">
-                <span className="text-gray-800">Golden</span>
-                <span className="text-primary">Pets</span>
-              </span>
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logocerta.png"
+                alt="Golden Pets"
+                className="h-10 md:h-12 w-auto"
+              />
             </Link>
 
             {/* Desktop Navigation */}

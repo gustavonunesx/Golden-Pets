@@ -30,20 +30,12 @@ export function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Logo and Description */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <svg viewBox="0 0 40 40" className="w-10 h-10" aria-hidden="true">
-                <g fill="#f97316">
-                  <ellipse cx="20" cy="26" rx="10" ry="8" />
-                  <ellipse cx="8" cy="14" rx="4" ry="5" transform="rotate(-20, 8, 14)" />
-                  <ellipse cx="32" cy="14" rx="4" ry="5" transform="rotate(20, 32, 14)" />
-                  <ellipse cx="10" cy="21" rx="3.5" ry="4.5" transform="rotate(-10, 10, 21)" />
-                  <ellipse cx="30" cy="21" rx="3.5" ry="4.5" transform="rotate(10, 30, 21)" />
-                </g>
-              </svg>
-              <span className="text-2xl font-black">
-                <span className="text-white">Golden</span>
-                <span className="text-primary">Pets</span>
-              </span>
+            <Link href="/" className="flex items-center mb-4">
+              <img
+                src="/footerlogo.png"
+                alt="Golden Pets"
+                className="h-12 w-auto"
+              />
             </Link>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Cuidado que seu pet merece. Produtos premium para cachorros e gatos com entrega para todo o Brasil.
